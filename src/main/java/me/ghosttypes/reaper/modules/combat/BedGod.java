@@ -539,11 +539,11 @@ public class BedGod extends ReaperModule {
                     int z = placePos.getZ();
                     Color s = bedRender.getSideColor();
                     Color l = bedRender.getLineColor();
-                    switch (direction) {
-                        case North -> event.renderer.box(x, y, z, x + 1, y + 0.6, z + 2, s, l, shapeMode.get(), 0);
-                        case South -> event.renderer.box(x, y, z - 1, x + 1, y + 0.6, z + 1, s, l, shapeMode.get(), 0);
-                        case East -> event.renderer.box(x - 1, y, z, x + 1, y + 0.6, z + 1, s, l, shapeMode.get(), 0);
-                        case West -> event.renderer.box(x, y, z, x + 2, y + 0.6, z + 1, s, l, shapeMode.get(), 0);
+                    switch (direction.toDirection().getOpposite()) {
+                        case NORTH -> event.renderer.box(x, y, z, x + 1, y + 0.6, z + 2, s, l, shapeMode.get(), 0);
+                        case SOUTH -> event.renderer.box(x, y, z - 1, x + 1, y + 0.6, z + 1, s, l, shapeMode.get(), 0);
+                        case EAST -> event.renderer.box(x - 1, y, z, x + 1, y + 0.6, z + 1, s, l, shapeMode.get(), 0);
+                        case WEST -> event.renderer.box(x, y, z, x + 2, y + 0.6, z + 1, s, l, shapeMode.get(), 0);
                     }
                 }
             }
