@@ -13,7 +13,9 @@ import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.PillarBlock;
 import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection;
 import net.minecraft.client.recipebook.RecipeBookGroup;
 import net.minecraft.item.BedItem;
@@ -110,6 +112,14 @@ public class AutoBedCraft extends Module {
                 if (antiDesync.get()) mc.player.getInventory().updateItems();
                 return;
             }
+            currentScreenHandler = (CraftingScreenHandler) mc.player.currentScreenHandler;
+            if (isOutOfPlanks()) {
+                if (chatInfo.get()) error("You are of planks making more!");
+                if (disableNoMats.get()) toggle();
+                mc.player.closeHandledScreen();
+                if (antiDesync.get()) mc.player.getInventory().updateItems();
+                return;
+            }
             if (InvHelper.isInventoryFull()) {
                 if (disableAfter.get()) toggle();
                 if (closeAfter.get()) {
@@ -160,6 +170,7 @@ public class AutoBedCraft extends Module {
         return InvHelper.isInventoryFull();
     }
 
+
     private boolean canRefill(boolean checkSlots) {
         if (!autoWhileMoving.get() && Wrapper.isPlayerMoving(mc.player)) return false;
         if (autoOnlyHole.get() && !Wrapper.isInHole(mc.player)) return false;
@@ -177,6 +188,12 @@ public class AutoBedCraft extends Module {
         if (!wool.found() || !plank.found()) return true;
         return wool.count() < 3 || plank.count() < 3;
     }
+    private boolean isOutOfPlanks() {
+        FindItemResult plank = InvUtils.find(itemStack -> ItemHelper.planks.contains(itemStack.getItem()));
+        if (!plank.found()) return true;
+        return plank.count() < 3;
+    }
+
 
     private void windowClick(ScreenHandler container, int slot, SlotActionType action, int clickData) {
         assert mc.interactionManager != null;

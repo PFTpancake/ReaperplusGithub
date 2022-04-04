@@ -57,7 +57,7 @@ public class AutoCity extends Module {
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder().name("line-color").description("The line color.").defaultValue(new SettingColor(15, 255, 211)).build());
 
     public AutoCity() {
-        super(ML.R, "AutoCity", "the best bed aura");
+        super(ML.R, "AutoCity", "cum3.0");
     }
 
     private PlayerEntity target;

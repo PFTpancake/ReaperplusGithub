@@ -201,6 +201,7 @@ public class ML { // Module loader
             new RPC(),
             new StepPlus(),
             new BlinkPlus(),
+            new Speed(),
             new StreamerMode(),
             new StrictMove(),
             new WideScaffold()

@@ -10,8 +10,8 @@ public class MultiTask extends ReaperModule {
         super(ML.M, "multi-task", "Allows you to eat while mining a block.");
     }
 
-    @EventHandler
-    public void onInteractEvent(InteractEvent event) {
-        event.usingItem = false;
+        @EventHandler
+        private void onInteract(InteractEvent event) {
+            event.usingItem = false;
+        }
     }
-}
