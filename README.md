@@ -1,6 +1,6 @@
 <div align="center">
   <!-- Logo and Title -->
-  <img src="/src/main/java/me/reaper/util/logo/Icon_red.png">
+  <img src="/src/main/java/me/ghosttypes/reaper/util/logo/icon_red-min.png">
   <h1>Orion</h1>
   <p>Orion is a combat addon for Meteor Client</p>
 
