@@ -3,12 +3,7 @@
   <img src="/src/main/java/me/ghosttypes/reaper/util/logo/icon_red-min.png">
   <h1>Reaper+</h1>
   <p>Reaper+ is MeteorClient addon that gives Reaper life</p>
-
  
-</div>
-
-<div align="center">
-  <a href="https://discord.gg/9mrRPGKYU3"><img src="https://invidget.switchblade.xyz/9mrRPGKYU3"></a>
 </div>
 
 # How to use
