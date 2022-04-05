@@ -22,7 +22,7 @@ To top it all off, please provide as much information as you can (eg. Screenshot
 ### Modules
 - Anchor God
 - Auto Bed Craft
-- Auto Cit
+- Auto kit
 - Auto Respawn
 - Quick Mend
 - Bed Aura
