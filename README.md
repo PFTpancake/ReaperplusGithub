@@ -7,7 +7,7 @@
 </div>
 
 # How to use
-Download the New Verison In the Discord plus meteor Client )
+Download the New Verison In the Discord plus meteor Client
 
 Launch fabric loader for 1.18.2x.
 
