@@ -158,9 +158,8 @@ public class ML { // Module loader
             new AutoBedCraft(),
             new AutoCrystal(),
             new AutoTotemPlus(),
+            new Auto32k(),
             new BedGod(),
-            new AutoCity(),
-            new LongJump(),
             //new PistonAura(),
             new QuickMend(),
             new ReaperSurround(),
@@ -190,7 +189,6 @@ public class ML { // Module loader
         addModules(
             new AntiAim(),
             new AutoRespawn(),
-            new ChorusPredict(),
             new ElytraBotThreaded(),
             new MultiTask(),
             new NoDesync(),
@@ -199,17 +197,13 @@ public class ML { // Module loader
             new OneTap(),
             new PacketFly(),
             new RPC(),
-            new StepPlus(),
-            new BlinkPlus(),
             new Speed(),
             new StreamerMode(),
-            new StrictMove(),
-            new WideScaffold()
+            new StrictMove()
         );
 
         // render
         addModules(
-            new EpearlTracker(),
             new ExternalFeed(),
             new ExternalHUD(),
             new ExternalNotifications(),

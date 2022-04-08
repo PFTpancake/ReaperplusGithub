@@ -132,13 +132,13 @@ public class Formatter {
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
         if(timeOfDay < 12){
-            return "To Reaper+ DevBuild 0.0.5 " ;
+            return "To Reaper+ DevBuild 0.0.7 " ;
         } else if(timeOfDay < 16){
-            return "Reaper+ DevBuild 0.0.5 ";
+            return "Reaper+ DevBuild 0.0.7 ";
         } else if(timeOfDay < 21){
-            return "Reaper+ DevBuild 0.0.5 ";
+            return "Reaper+ DevBuild 0.0.7 ";
         } else {
-            return "Reaper+ DevBuild 0.0.5 ";
+            return "Reaper+ DevBuild 0.0.7 ";
         }
     }
 
@@ -151,7 +151,7 @@ public class Formatter {
         return " | Killstreak: " + Stats.killStreak;
     }
     public static String getSuffix() {
-        return " | Ｒｅａｐｅｒ+ | ＢｅｄＧｏｄ";
+        return " | Ｒｅａｐｅｒ+  | ＢｅｄＧｏｄ";
     }
     public static String getReaperSuffix() {return " | Ｒｅａｐｅｒ+ | ";}
     public static String getBedGodSuffix() {return " | ＢｅｄＧｏｄ |";}

@@ -37,10 +37,10 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 
         String t;
         if (!SpotifyService.isSpotifyRunning) {
-            t = "Repear+ DevBuild 0.0.6";
-            t = "Repear+ DevBuild 0.0.6";
+            t = "Repear+ DevBuild 0.0.7";
+            t = "Repear+ DevBuild 0.0.7";
         } else {
-            t = "Repear+ DevBuild 0.0.6 " + " " + "  " + " ";
+            t = "Repear+ DevBuild 0.0.7 " + " " + "  " + " ";
         }
 
         width = Math.max(width, renderer.textWidth(t));

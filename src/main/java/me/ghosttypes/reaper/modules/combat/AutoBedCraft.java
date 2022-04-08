@@ -1,5 +1,6 @@
 package me.ghosttypes.reaper.modules.combat;
 
+import net.minecraft.block.PillarBlock;
 import me.ghosttypes.reaper.modules.ML;
 import me.ghosttypes.reaper.util.Wrapper;
 import me.ghosttypes.reaper.util.player.InvHelper;
@@ -105,14 +106,6 @@ public class AutoBedCraft extends Module {
                 return;
             }
             CraftingScreenHandler currentScreenHandler = (CraftingScreenHandler) mc.player.currentScreenHandler;
-            if (isOutOfMaterial()) {
-                if (chatInfo.get()) error("You are out of material!");
-                if (disableNoMats.get()) toggle();
-                mc.player.closeHandledScreen();
-                if (antiDesync.get()) mc.player.getInventory().updateItems();
-                return;
-            }
-            currentScreenHandler = (CraftingScreenHandler) mc.player.currentScreenHandler;
             if (isOutOfPlanks()) {
                 if (chatInfo.get()) error("You are of planks making more!");
                 if (disableNoMats.get()) toggle();
@@ -139,6 +132,8 @@ public class AutoBedCraft extends Module {
                     }
                 }
             }
+
+
         }
     }
 
@@ -188,6 +183,7 @@ public class AutoBedCraft extends Module {
         if (!wool.found() || !plank.found()) return true;
         return wool.count() < 3 || plank.count() < 3;
     }
+
     private boolean isOutOfPlanks() {
         FindItemResult plank = InvUtils.find(itemStack -> ItemHelper.planks.contains(itemStack.getItem()));
         if (!plank.found()) return true;
