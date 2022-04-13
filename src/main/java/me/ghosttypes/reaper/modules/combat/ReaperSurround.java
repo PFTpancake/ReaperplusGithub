@@ -48,6 +48,7 @@ public class ReaperSurround extends ReaperModule {
     private final Setting<Boolean> antiCity = sgGeneral.add(new BoolSetting.Builder().name("anti-city").description("Try to protect you from getting citied.").defaultValue(false).build());
     private final Setting<Boolean> antiCityWait = sgGeneral.add(new BoolSetting.Builder().name("anti-city-wait").description("Wait for the base surround to be finished before anti city activates.").defaultValue(false).visible(antiCity::get).build());
     private final Setting<Integer> antiCityFactor = sgGeneral.add(new IntSetting.Builder().name("anti-city-factor").description("").defaultValue(2).min(0).sliderMax(20).visible(antiCity::get).build());
+    private final Setting<Integer> anticrystal = sgGeneral.add(new IntSetting.Builder().name("anti-crystal").description("").defaultValue(3).min(0).sliderMax(20).visible(antiCity::get).build());
     private final Setting<Integer> antiCityDelay = sgGeneral.add(new IntSetting.Builder().name("anti-city-delay").description("").defaultValue(3).min(0).sliderMax(20).visible(antiCity::get).build());
     private final Setting<Integer> blockPerTick = sgGeneral.add(new IntSetting.Builder().name("blocks-per-tick").description("Block placements per tick.").defaultValue(4).min(1).sliderMax(10).build());
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder().name("block").description("What blocks to use for surround.").defaultValue(Collections.singletonList(Blocks.OBSIDIAN)).filter(this::blockFilter).build());

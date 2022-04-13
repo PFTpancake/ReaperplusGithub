@@ -63,8 +63,6 @@ public class PopCounter extends Module {
         .build()
     );
 
-    // Visual Range
-
 
 
     private final Object2IntMap<UUID> totemPopMap = new Object2IntOpenHashMap<>();

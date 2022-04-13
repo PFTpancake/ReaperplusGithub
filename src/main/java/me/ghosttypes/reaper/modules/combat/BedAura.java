@@ -2,6 +2,21 @@ package me.ghosttypes.reaper.modules.combat;
 
 import me.ghosttypes.reaper.events.DeathEvent;
 import me.ghosttypes.reaper.modules.ML;
+import meteordevelopment.meteorclient.events.render.Render3DEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.meteorclient.renderer.ShapeMode;
+import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import java.util.List;
 import me.ghosttypes.reaper.util.misc.ReaperModule;
 import me.ghosttypes.reaper.util.misc.Formatter;
 import me.ghosttypes.reaper.util.misc.MathUtil;
@@ -15,25 +30,16 @@ import me.ghosttypes.reaper.util.world.DamageCalculator;
 import me.ghosttypes.reaper.util.world.DamageCalculator.BedPlacement;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
-import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.renderer.*;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
-import meteordevelopment.meteorclient.settings.*;
-import meteordevelopment.meteorclient.systems.modules.combat.BedAura;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
 import meteordevelopment.meteorclient.utils.misc.Vec3;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
-import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.meteorclient.utils.world.CardinalDirection;
-import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.recipebook.RecipeResultCollection;
 import net.minecraft.client.recipebook.RecipeBookGroup;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,16 +49,12 @@ import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
 import java.util.Objects;
 
-public class BedGod extends ReaperModule {
+public class BedAura extends ReaperModule {
 
     public enum RenderMode {
         Single,
@@ -110,6 +112,7 @@ public class BedGod extends ReaperModule {
     public final Setting<Integer> autoCraftTableDelay = sgAutoCraft.add(new IntSetting.Builder().name("table-delay").defaultValue(10).description("The delay between placing crafting tables.").sliderRange(0, 20).build());
 
     // anti hole fag
+    public final Setting<Boolean> anticrystalblock = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-crystal-block").description("Automatically hits crystals's that blocks beds.").defaultValue(false).build());
     public final Setting<Boolean> antiSelfTrap = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-self-trap").description("Automatically mine the target's self trap.").defaultValue(false).build());
     public final Setting<Boolean> antiBurrow = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-burrow").description("Automatically mine the target's burrow.").defaultValue(false).build());
     public final Setting<Boolean> antiString = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-string").description("Automatically mine the target's string/web.").defaultValue(false).build());
@@ -137,7 +140,7 @@ public class BedGod extends ReaperModule {
     private PlayerEntity target;
     private BedPlacement placePos;
     private SimpleBedRender bedRender;
-    private MineInstance trapMine, burrowMine;
+    private MineInstance trapMine, burrowMine, anvilMine, crystalbreak;
     private int timer;
     private int tableTimer;
     private int syncTimer;
@@ -147,7 +150,7 @@ public class BedGod extends ReaperModule {
     private boolean alertedCraft;
     private long bedTimer;
 
-    public BedGod() {
+    public BedAura() {
         super(ML.R, "bed-god", "the best bed aura");
     }
 
@@ -160,6 +163,8 @@ public class BedGod extends ReaperModule {
         tableTimer = autoCraftTableDelay.get();
         trapMine = null;
         burrowMine = null;
+        anvilMine = null;
+        crystalbreak = null;
         bedsPlaced = 0;
         bedTimer = MathUtil.now();
     }
@@ -208,7 +213,8 @@ public class BedGod extends ReaperModule {
         alertedCraft = false;
 
         if (target != null) {
-            if (target.deathTime > 0 || target.getHealth() <= 0) MeteorClient.EVENT_BUS.post(DeathEvent.KillEvent.get(target, target.getPos()));
+            if (target.deathTime > 0 || target.getHealth() <= 0)
+                MeteorClient.EVENT_BUS.post(DeathEvent.KillEvent.get(target, target.getPos()));
             target = null;
         }
         target = TargetUtils.getPlayerTarget(targetRange.get(), SortPriority.LowestDistance); // targeting
@@ -229,6 +235,10 @@ public class BedGod extends ReaperModule {
         if (antiSelfTrap.get()) { // anti camper checks
             doAntiTrap();
             if (trapMine != null) return;
+        }
+        if (anticrystalblock.get()) { // anti camper checks
+            doAntiblock();
+            if (crystalbreak != null) return;
         }
         if (antiBurrow.get()) {
             doAntiBurrow();
@@ -296,7 +306,8 @@ public class BedGod extends ReaperModule {
         lastCalc = MathUtil.millisElapsed(start);
         if (debug.get()) info("Calculated placement in " + lastCalc + " , placing + exploding");
         doBed(placePos.getPos(), placePos.getVec(), placePos.getRotationOffset(), placePos.getHitResult());
-        if (render.get()) bedRender = new SimpleBedRender(placePos.getPos(), bedRenderTime.get(), placePos.getRotationOffset(), sideColor.get(), lineColor.get(), damageColor.get(), bedFadeTime.get(), placePos.getDamage());
+        if (render.get())
+            bedRender = new SimpleBedRender(placePos.getPos(), bedRenderTime.get(), placePos.getRotationOffset(), sideColor.get(), lineColor.get(), damageColor.get(), bedFadeTime.get(), placePos.getDamage());
     }
 
     private void setPlacePos() {
@@ -330,29 +341,30 @@ public class BedGod extends ReaperModule {
         }
     }
 
+
     private void doAntiBurrow() {
         if (antiRequireHole.get() && !Interactions.isInHole()) return;
         if (target == null) {
-            burrowMine = null;
+            anvilMine = null;
             return;
         }
         if (!CombatHelper.isBurrowed(target)) {
-            burrowMine = null;
+            anvilMine = null;
             return;
         }
         if (BlockHelper.distanceTo(target.getBlockPos()) > 4.8) return;
-        if (burrowMine == null) {
-            burrowMine = new MineInstance(target.getBlockPos());
-            burrowMine.init();
+        if (anvilMine == null) {
+            anvilMine = new MineInstance(target.getBlockPos());
+            anvilMine.init();
         } else {
-            if (!burrowMine.isValid()) {
-                burrowMine = null;
+            if (!anvilMine.isValid()) {
+                anvilMine = null;
                 return;
             }
-            burrowMine.tick();
-            if (burrowMine.isReady()) {
-                burrowMine.finish();
-                burrowMine = null;
+            anvilMine.tick();
+            if (anvilMine.isReady()) {
+                anvilMine.finish();
+                anvilMine = null;
             }
         }
     }
@@ -372,8 +384,19 @@ public class BedGod extends ReaperModule {
                 break;
             }
         }
-    }
-
+    }  //Break Crystals that block the beds. But meteorpvps packet limit makes it hard for it to do
+    private void doAntiblock() {
+        if (debug.get()) info("Trying to break Crystals()");
+        if (anticrystalblock.get()) {
+            for (Entity entity : mc.world.getEntities()) {
+                if (entity instanceof EndCrystalEntity) {
+                    BlockPos crystalPos = entity.getBlockPos();
+                        mc.player.networkHandler.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSprinting()));
+                        return;
+                    }
+                }
+            }
+        }
 
     private void doBreak(BlockPos pos) {
         if (pos == null) return;
@@ -524,7 +547,7 @@ public class BedGod extends ReaperModule {
         return table;
     }
 
-
+// Render
     @EventHandler
     private void onRender3d(Render3DEvent event) { // bed rendering
         if (render.get() && bedRender != null && target != null) {
@@ -555,7 +578,7 @@ public class BedGod extends ReaperModule {
         if (render.get() && bedRender != null && placeCheck(placePos) && target != null) {
             if (bedRender.getPos() == null) return;
             Vec3 textVec = BlockHelper.vec3(bedRender.getPos());
-            String damageText = String.valueOf(Math.round(placePos.getDamage() * 100.0) / 100.0);
+            String damageText = String.valueOf(Math.round(placePos.getDamage() * 50.0) / 50.0);
             if (textVec != null) {
                 if (NametagUtils.to2D(textVec, damageScale.get())) {
                     NametagUtils.begin(textVec);
@@ -580,6 +603,6 @@ public class BedGod extends ReaperModule {
             if (bedPerSec.get()) return iString + " BPS: [" + bedsPlaced + "]";
             else return iString;
         }
-        return "Idle";
+        return "Waiting";
     }
 }

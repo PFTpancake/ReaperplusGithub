@@ -1,6 +1,5 @@
 package me.ghosttypes.reaper.modules.chat;
 
-import me.ghosttypes.reaper.Reaper;
 import me.ghosttypes.reaper.events.DeathEvent;
 import me.ghosttypes.reaper.modules.ML;
 import me.ghosttypes.reaper.util.misc.Formatter;

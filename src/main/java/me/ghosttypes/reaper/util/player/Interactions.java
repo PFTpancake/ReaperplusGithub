@@ -166,6 +166,7 @@ public class Interactions {
         if (item instanceof EnderPearlItem) return "Pearls";
         if (item.equals(Items.TOTEM_OF_UNDYING)) return "Totems";
         if (Block.getBlockFromItem(item) == Blocks.OBSIDIAN) return "Obby";
+        if (Block.getBlockFromItem(item) == Blocks.ANVIL) return "Anvil";
         if (Block.getBlockFromItem(item) instanceof EnderChestBlock) return "Echests";
         return Names.get(item);
     }

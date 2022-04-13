@@ -19,7 +19,7 @@ import java.util.List;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
-public class CombatHelper {
+public class  CombatHelper {
 
     public enum HoleType {Mixed, Obsidian, Bedrock, Invalid}
 

@@ -1,7 +1,7 @@
 package me.ghosttypes.reaper.modules.misc;
 
 import me.ghosttypes.reaper.modules.ML;
-import me.ghosttypes.reaper.modules.combat.BedGod;
+import me.ghosttypes.reaper.modules.combat.BedAura;
 import me.ghosttypes.reaper.util.misc.ReaperModule;
 import me.ghosttypes.reaper.util.player.Interactions;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -13,7 +13,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.EnderPearlItem;
 import net.minecraft.item.ExperienceBottleItem;
-import net.minecraft.item.Items;
 
 public class AntiAim extends ReaperModule {
     private final SettingGroup sgDefault = settings.getDefaultGroup();
@@ -61,7 +60,7 @@ public class AntiAim extends ReaperModule {
     private boolean shouldStop() {
         return Modules.get().isActive(EXPThrower.class) ||
             Modules.get().isActive(meteordevelopment.meteorclient.systems.modules.combat.BedAura.class) ||
-            Modules.get().isActive(BedGod.class) ||
+            Modules.get().isActive(BedAura.class) ||
             mc.player.getMainHandStack().getItem() instanceof ExperienceBottleItem ||
             mc.player.getOffHandStack().getItem() instanceof ExperienceBottleItem ||
             mc.player.getMainHandStack().getItem() instanceof EnderPearlItem ||

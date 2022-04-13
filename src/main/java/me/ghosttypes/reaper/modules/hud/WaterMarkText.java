@@ -69,7 +69,7 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 
         String t;
 
-         t = "Repear+ DevBuild 0.0.6";
+         t = "Reaper+ DevBuild 0.0.7";
 
         Renderer2D.COLOR.begin();
         if (drawSide.get()) Renderer2D.COLOR.quad(x + box.alignX(renderer.textWidth(t)) - 6, y - 4, TextRenderer.get().getWidth(t) + 10, renderer.textHeight(), sideC);

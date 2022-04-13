@@ -1,7 +1,6 @@
 package me.ghosttypes.reaper.util.misc;
 
 import me.ghosttypes.reaper.modules.chat.AutoEZ;
-import me.ghosttypes.reaper.modules.chat.PopCounter;
 import me.ghosttypes.reaper.modules.combat.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -23,7 +22,7 @@ public class ModuleHelper {
         Modules.get().get(AnchorGod.class),
         Modules.get().get(AntiSurround.class),
         //Modules.get().get(AutoCrystal.class),
-        Modules.get().get(BedGod.class),
+        Modules.get().get(BedAura.class),
         //Modules.get().get(CevBreaker.class),
         //Modules.get().get(PistonAura.class),
         Modules.get().get(QuickMend.class),
