@@ -113,6 +113,7 @@ public class BedAura extends ReaperModule {
 
     // anti hole fag
     public final Setting<Boolean> anticrystalblock = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-crystal-block").description("Automatically hits crystals's that blocks beds.").defaultValue(false).build());
+    public final Setting<Boolean> meteorbypass = sgAntiHoleFag.add(new BoolSetting.Builder().name("meteorbypass").description("Automatically hits crystals's that blocks beds.").defaultValue(false).build());
     public final Setting<Boolean> antiSelfTrap = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-self-trap").description("Automatically mine the target's self trap.").defaultValue(false).build());
     public final Setting<Boolean> antiBurrow = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-burrow").description("Automatically mine the target's burrow.").defaultValue(false).build());
     public final Setting<Boolean> antiString = sgAntiHoleFag.add(new BoolSetting.Builder().name("anti-string").description("Automatically mine the target's string/web.").defaultValue(false).build());
@@ -151,7 +152,7 @@ public class BedAura extends ReaperModule {
     private long bedTimer;
 
     public BedAura() {
-        super(ML.R, "bed-god", "the best bed aura");
+        super(ML.R, "BedAura", "the best bed aura");
     }
 
     @Override
@@ -282,6 +283,7 @@ public class BedAura extends ReaperModule {
     private void doBomb() {
         assert mc.player != null;
         if (mc.player.currentScreenHandler instanceof CraftingScreenHandler && autoCraftPause.get()) return;
+        if (mc.player.currentScreenHandler instanceof CraftingScreenHandler && meteorbypass.get()) return;
         long start = MathUtil.now();
         if (!placeCheck(placePos)) { // check if we have a current place pos
             if (debug.get()) info("invalid place pos, recalculating.");
@@ -340,8 +342,6 @@ public class BedAura extends ReaperModule {
             }
         }
     }
-
-
     private void doAntiBurrow() {
         if (antiRequireHole.get() && !Interactions.isInHole()) return;
         if (target == null) {
@@ -550,12 +550,11 @@ public class BedAura extends ReaperModule {
 // Render
     @EventHandler
     private void onRender3d(Render3DEvent event) { // bed rendering
-        if (render.get() && bedRender != null && target != null) {
+        if (render.get() && bedRender != null && placePos != null) {
             if (bedRender.getPos() == null || bedRender.getDir() == null) return;
             BlockPos placePos = bedRender.getPos();
             CardinalDirection direction = bedRender.getDir();
             switch (renderMode.get()) {
-                case Single -> event.renderer.box(bedRender.getPos(), bedRender.getSideColor(), bedRender.getLineColor(), shapeMode.get(), 0);
                 case Outline -> {
                     int x = placePos.getX();
                     int y = placePos.getY();
@@ -583,8 +582,8 @@ public class BedAura extends ReaperModule {
                 if (NametagUtils.to2D(textVec, damageScale.get())) {
                     NametagUtils.begin(textVec);
                     TextRenderer.get().begin(1.0, false, true);
-                    final double w = TextRenderer.get().getWidth(damageText) / 2.0;
-                    TextRenderer.get().render(damageText, -w, 0.0, bedRender.getDamageColor());
+                    final double w = TextRenderer.get().getWidth(damageText) / 1.0;
+                    TextRenderer.get().render(damageText, -w, 0.5, bedRender.getDamageColor());
                     TextRenderer.get().end();
                     NametagUtils.end();
                 }

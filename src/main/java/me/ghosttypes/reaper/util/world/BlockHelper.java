@@ -41,7 +41,8 @@ public class BlockHelper {
         Web,
         Surround,
         DoubleSurround,
-        SelfTrap
+        SelfTrap,
+        PistonTrap
     }
 
     public static class BlockPosExtended {
@@ -232,10 +233,12 @@ public class BlockHelper {
         BlockPos up = center.up();
         final ArrayList<BlockPos> blocks = new ArrayList<>();
         if (type == BlockListType.SelfTrap) blocks.add(center.up(2));
+        if (type == BlockListType.PistonTrap) blocks.add(center.up(2));
         switch (type) {
             case Web -> IntStream.rangeClosed(0, 3).boxed().sorted(Collections.reverseOrder()).forEach(i -> blocks.add(center.up(i)));
             case Surround -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(center.offset(dir.toDirection())); }
             case SelfTrap -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(up.offset(dir.toDirection())); }
+            case PistonTrap -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(up.offset(dir.toDirection())); }
             case DoubleSurround -> {
                 for (CardinalDirection dir : CardinalDirection.values()) blocks.add(center.offset(dir.toDirection()));
                 for (CardinalDirection dir : CardinalDirection.values()) blocks.add(up.offset(dir.toDirection()));
@@ -257,6 +260,7 @@ public class BlockHelper {
     public static ArrayList<BlockPos> getSurroundBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.Surround); }
     public static ArrayList<BlockPos> getDoubleSurroundBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.DoubleSurround); }
     public static ArrayList<BlockPos> getSelfTrapBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.SelfTrap); }
+    public static ArrayList<BlockPos> getPistonTrapBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.PistonTrap); }
     public static ArrayList<BlockPos> getWebBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.Web); }
 
 

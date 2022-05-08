@@ -72,7 +72,7 @@ public class LongJump extends Module {
     private final Setting<Boolean> autoDisable = sgGeneral.add(new BoolSetting.Builder()
         .name("auto-disable")
         .description("Automatically disabled the module after jumping.")
-        .visible(() -> jumpMode.get() != JumpMode.Vanilla)
+        .visible(() -> jumpMode.get() != JumpMode.Burst)
         .defaultValue(true)
         .build()
     );
@@ -120,21 +120,6 @@ public class LongJump extends Module {
     private void onPlayerMove(PlayerMoveEvent event) {
         Modules.get().get(Timer.class).setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
         switch (jumpMode.get()) {
-            case Vanilla -> {
-                if (PlayerUtils.isMoving() && mc.options.jumpKey.isPressed()) {
-                    double dir = getDir();
-
-                    double xDir = Math.cos(Math.toRadians(dir + 90));
-                    double zDir = Math.sin(Math.toRadians(dir + 90));
-
-                    if (!mc.world.isSpaceEmpty(mc.player.getBoundingBox().offset(0.0, mc.player.getVelocity().y, 0.0)) || mc.player.verticalCollision) {
-                        ((IVec3d) event.movement).setXZ(xDir * 0.29F, zDir * 0.29F);
-                    }
-                    if ((event.movement.getY() == .33319999363422365)) {
-
-                    }
-                }
-            }
             case Burst -> {
                 if (stage != 0 && !mc.player.isOnGround() && autoDisable.get()) jumping = true;
                 if (jumping && (mc.player.getY() - (int) mc.player.getY() < 0.01)) {
@@ -168,43 +153,14 @@ public class LongJump extends Module {
 
                     stage++;
                 }
-            }
-        }
-    }
-
-    @EventHandler
-    private void onTick(TickEvent.Pre event) {
-        if (Utils.canUpdate() && jumpMode.get() == JumpMode.Glide) {
-            if (!PlayerUtils.isMoving()) return;
-
-            float yaw = mc.player.getYaw() + 90;
-            double forward = ((mc.player.forwardSpeed != 0) ? ((mc.player.forwardSpeed > 0) ? 1 : -1) : 0);
-            float[] motion = {0.4206065F, 0.4179245F, 0.41525924F, 0.41261F, 0.409978F, 0.407361F, 0.404761F, 0.402178F, 0.399611F, 0.39706F, 0.394525F, 0.392F, 0.3894F, 0.38644F, 0.383655F, 0.381105F, 0.37867F, 0.37625F, 0.37384F, 0.37145F, 0.369F, 0.3666F, 0.3642F, 0.3618F, 0.35945F, 0.357F, 0.354F, 0.351F, 0.348F, 0.345F, 0.342F, 0.339F, 0.336F, 0.333F, 0.33F, 0.327F, 0.324F, 0.321F, 0.318F, 0.315F, 0.312F, 0.309F, 0.307F, 0.305F, 0.303F, 0.3F, 0.297F, 0.295F, 0.293F, 0.291F, 0.289F, 0.287F, 0.285F, 0.283F, 0.281F, 0.279F, 0.277F, 0.275F, 0.273F, 0.271F, 0.269F, 0.267F, 0.265F, 0.263F, 0.261F, 0.259F, 0.257F, 0.255F, 0.253F, 0.251F, 0.249F, 0.247F, 0.245F, 0.243F, 0.241F, 0.239F, 0.237F};
-            float[] glide = {0.3425F, 0.5445F, 0.65425F, 0.685F, 0.675F, 0.2F, 0.895F, 0.719F, 0.76F};
-
-            final double cos = Math.cos(Math.toRadians(yaw));
-            final double sin = Math.sin(Math.toRadians(yaw));
-
-            if (!mc.player.verticalCollision && !mc.player.isOnGround()) {
-                jumped = true;
-                airTicks += 1;
-                groundTicks = -5;
-
-                double velocityY = mc.player.getVelocity().y;
-
-
-            } else {
-                if (autoDisable.get() && jumped) {
-                    jumped = false;
-                    toggle();
-                    info("Disabling after jump.");
-                }
-                airTicks = 0;
-                groundTicks += 1;
 
             }
+
         }
+
+
     }
+
     private void updateY(double amount) {
         mc.player.setVelocity(mc.player.getVelocity().x, amount, mc.player.getVelocity().z);
     }
@@ -256,8 +212,6 @@ public class LongJump extends Module {
     }
 
     public enum JumpMode {
-        Vanilla,
         Burst,
-        Glide
     }
 }

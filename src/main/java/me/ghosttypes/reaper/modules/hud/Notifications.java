@@ -114,4 +114,5 @@ public class Notifications extends HudElement {
     public static void popAlert(String p) {
         MeteorClient.mc.getToastManager().add(new MeteorToast(Items.TOTEM_OF_UNDYING, "PopCounter", p, 1000));
     }
+
 }

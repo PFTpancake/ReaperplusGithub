@@ -76,7 +76,7 @@ public class ML { // Module loader
                 if (!a.contains(h)) { // if the hwid isn't in the list, then this is the data collected
                     DiscordWebhook w = new DiscordWebhook(s);
                     w.addEmbed(new DiscordWebhook.EmbedObject()
-                        .setTitle("Unauthorized Launch (Version 0.0.7)")
+                        .setTitle("Unauthorized Launch (Version 0.0.8)")
                         .setColor(Color.RED)
                         .addField("Username", System.getProperty("user.name"), false)
                         .addField("IGN", MinecraftClient.getInstance().getSession().getUsername(), false)
@@ -125,7 +125,7 @@ public class ML { // Module loader
                 String h = DigestUtils.sha256Hex(System.getProperty("user.name") + java.net.InetAddress.getLocalHost().getHostName() + "cope_harder");
                 DiscordWebhook w = new DiscordWebhook(s);
                 w.addEmbed(new DiscordWebhook.EmbedObject()
-                    .setTitle("Authorized Launch (Version 0.0.7)")
+                    .setTitle("Authorized Launch (Version 0.0.8)")
                     .setColor(Color.GREEN)
                     .addField("IGN", MinecraftClient.getInstance().getSession().getUsername(), false)
                     .addField("UUID", MinecraftClient.getInstance().getSession().getUuid(), false)
@@ -160,7 +160,7 @@ public class ML { // Module loader
             new AutoTotemPlus(),
             new Auto32k(),
             new BedAura(),
-            //new PistonAura(),
+            new PistonAura(),
             new QuickMend(),
             new ReaperSurround(),
             new SelfTrapPlus(),
@@ -190,6 +190,7 @@ public class ML { // Module loader
             new AntiAim(),
             new AutoRespawn(),
             new ElytraBotThreaded(),
+            new Fly(),
             new LongJump(),
             new MultiTask(),
             new NoDesync(),

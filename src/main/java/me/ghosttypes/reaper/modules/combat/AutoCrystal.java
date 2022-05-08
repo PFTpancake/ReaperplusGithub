@@ -997,6 +997,7 @@ public class AutoCrystal extends Module {
         for (PlayerEntity target : targets) {
             BlockPos pos = target.getBlockPos();
 
+            //1k
             if (crystal.getY() == pos.getY() + 1 && Math.abs(pos.getX() - crystal.getX()) <= 1 && Math.abs(pos.getZ() - crystal.getZ()) <= 1) {
                 if (EntityUtils.getTotalHealth(target) <= facePlaceHealth.get()) return true;
 

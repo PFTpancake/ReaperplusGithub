@@ -36,6 +36,7 @@ public class SelfTrapPlus extends ReaperModule {
     public enum PlaceMode {
         AntiFacePlace,
         Full,
+        AntiPiston,
         Top,
         None
     }
@@ -134,6 +135,10 @@ public class SelfTrapPlus extends ReaperModule {
                 switch (placeMode.get()) {
                     case Top -> positions.add(center.up(2));
                     case AntiFacePlace -> positions.addAll(BlockHelper.getBlockList(center, BlockListType.DoubleSurround));
+                    case AntiPiston -> {
+                        positions.addAll(BlockHelper.getBlockList(center, BlockListType.PistonTrap));
+                        positions.add(center.up(2));
+                    }
                     case Full -> {
                         positions.addAll(BlockHelper.getBlockList(center, BlockListType.SelfTrap));
                         positions.add(center.up(2));

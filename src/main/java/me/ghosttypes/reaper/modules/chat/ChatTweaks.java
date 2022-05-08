@@ -92,7 +92,7 @@ public class ChatTweaks extends ReaperModule {
     public LiteralText getPrefix() {
         BaseText logo = new LiteralText("");
         LiteralText prefix = new LiteralText("");
-        String logoT = "Reaper";
+        String logoT = "Reaper+";
         if (customPrefix.get()) logoT = prefixText.get();
         if (customPrefixColor.get() && !chromaPrefix.get()) logo.append(new LiteralText(logoT).setStyle(logo.getStyle().withColor(TextColor.fromRgb(prefixColor.get().getPacked()))));
         if (chromaPrefix.get() && !customPrefixColor.get()) {
@@ -101,7 +101,7 @@ public class ChatTweaks extends ReaperModule {
         }
         if (!customPrefixColor.get() && !chromaPrefix.get()) {
             if (customPrefix.get()) { logo.append(prefixText.get());
-            } else { logo.append("Reaper"); }
+            } else { logo.append("Reaper+"); }
             logo.setStyle(logo.getStyle().withFormatting(Formatting.RED));
         }
         if (themeBrackets.get()) {
