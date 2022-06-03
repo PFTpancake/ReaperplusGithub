@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseMixin {
     @Inject(method = "onMouseButton", at = @At("RETURN"))
     private void onMouse(long window, int button, int action, int mods, CallbackInfo ci) {
+        if(mc.currentScreen != null) return;
         MeteorClient.EVENT_BUS.post(KeyEvent.get(button, 0, KeyAction.get(action)));
     }
 }
