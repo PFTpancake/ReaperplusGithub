@@ -7,7 +7,7 @@
 </div>
 
 
-Big thx to Everyone that i skidded and tyrannous for helping me 
+Big thx to Everyone that i skidded and tyrannus for helping me 
 this is every client in one and fixing Reaper fuck ghost he is monk
 
 # How to use
