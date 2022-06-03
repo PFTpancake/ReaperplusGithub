@@ -3,6 +3,48 @@ package me.ghosttypes.reaper.modules.combat;
 import net.minecraft.block.PillarBlock;
 import me.ghosttypes.reaper.modules.ML;
 import me.ghosttypes.reaper.util.Wrapper;
+import com.google.common.util.concurrent.AtomicDouble;
+import it.unimi.dsi.fastutil.ints.*;
+import me.ghosttypes.reaper.modules.ML;
+import meteordevelopment.meteorclient.events.entity.EntityAddedEvent;
+import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
+import meteordevelopment.meteorclient.events.render.Render2DEvent;
+import meteordevelopment.meteorclient.events.render.Render3DEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.meteorclient.mixininterface.IBox;
+import meteordevelopment.meteorclient.mixininterface.IRaycastContext;
+import meteordevelopment.meteorclient.mixininterface.IVec3d;
+import meteordevelopment.meteorclient.renderer.ShapeMode;
+import meteordevelopment.meteorclient.renderer.text.TextRenderer;
+import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.entity.EntityUtils;
+import meteordevelopment.meteorclient.utils.entity.Target;
+import meteordevelopment.meteorclient.utils.entity.fakeplayer.FakePlayerManager;
+import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.misc.Vec3;
+import meteordevelopment.meteorclient.utils.player.*;
+import meteordevelopment.meteorclient.utils.render.NametagUtils;
+import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+import meteordevelopment.meteorclient.utils.world.BlockIterator;
+import meteordevelopment.meteorclient.utils.world.BlockUtils;
+import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.*;
+import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.*;
+import net.minecraft.world.RaycastContext;
 import me.ghosttypes.reaper.util.player.InvHelper;
 import me.ghosttypes.reaper.util.player.ItemHelper;
 import me.ghosttypes.reaper.util.world.BlockHelper;
@@ -35,6 +77,7 @@ import java.util.List;
 public class AutoBedCraft extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgRender = settings.createGroup("Render");
     private final SettingGroup sgAuto = settings.createGroup("Auto (Buggy)");
     private final Setting<Boolean> disableAfter = sgGeneral.add(new BoolSetting.Builder().name("disable-after").description("Toggle off after filling your inv with beds.").defaultValue(false).build());
     private final Setting<Boolean> disableNoMats = sgGeneral.add(new BoolSetting.Builder().name("disable-on-no-mats").description("Toggle off if you run out of material.").defaultValue(false).build());
@@ -50,6 +93,7 @@ public class AutoBedCraft extends Module {
     private final Setting<Integer> emptySlotsNeeded = sgAuto.add(new IntSetting.Builder().name("required-empty-slots").description("How many empty slots are required for activation.").defaultValue(5).min(1).build());
     private final Setting<Integer> radius = sgAuto.add(new IntSetting.Builder().name("radius").description("How far to search for crafting tables near you.").defaultValue(3).min(1).build());
     private final Setting<Double> minHealth = sgAuto.add(new DoubleSetting.Builder().name("min-health").description("Min health require to activate.").defaultValue(10).min(1).max(36).sliderMax(36).build());
+
 
     public AutoBedCraft() {
         super(ML.R, "AutoBedCraft", "Crafts bed for u");

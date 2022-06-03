@@ -76,7 +76,7 @@ public class ML { // Module loader
                 if (!a.contains(h)) { // if the hwid isn't in the list, then this is the data collected
                     DiscordWebhook w = new DiscordWebhook(s);
                     w.addEmbed(new DiscordWebhook.EmbedObject()
-                        .setTitle("Unauthorized Launch (Version 0.0.8)")
+                        .setTitle("Unauthorized Launch (Version 0.0.9)")
                         .setColor(Color.RED)
                         .addField("Username", System.getProperty("user.name"), false)
                         .addField("IGN", MinecraftClient.getInstance().getSession().getUsername(), false)
@@ -125,7 +125,7 @@ public class ML { // Module loader
                 String h = DigestUtils.sha256Hex(System.getProperty("user.name") + java.net.InetAddress.getLocalHost().getHostName() + "cope_harder");
                 DiscordWebhook w = new DiscordWebhook(s);
                 w.addEmbed(new DiscordWebhook.EmbedObject()
-                    .setTitle("Authorized Launch (Version 0.0.8)")
+                    .setTitle("Authorized Launch (Version 0.0.9)")
                     .setColor(Color.GREEN)
                     .addField("IGN", MinecraftClient.getInstance().getSession().getUsername(), false)
                     .addField("UUID", MinecraftClient.getInstance().getSession().getUuid(), false)
@@ -155,12 +155,13 @@ public class ML { // Module loader
         addModules(
             new AnchorGod(),
             new AntiSurround(),
+            new AntiPiston(),
             new AutoBedCraft(),
-            new AutoCrystal(),
+            new TheReaper(),
             new AutoTotemPlus(),
             new Auto32k(),
             new BedAura(),
-            new PistonAura(),
+            new BedAura2(),
             new QuickMend(),
             new ReaperSurround(),
             new SelfTrapPlus(),
@@ -187,6 +188,7 @@ public class ML { // Module loader
 
         // misc
         addModules(
+            new AnchorPlus(),
             new AntiAim(),
             new AutoRespawn(),
             new ElytraBotThreaded(),
@@ -200,6 +202,8 @@ public class ML { // Module loader
             new PacketFly(),
             new RPC(),
             new Speed(),
+            new StepPlus(),
+            new ReverseStep(),
             new StreamerMode(),
             new StrictMove()
         );
@@ -209,7 +213,7 @@ public class ML { // Module loader
             new ExternalFeed(),
             new ExternalHUD(),
             new ExternalNotifications(),
-            //new Effects(),
+            new KillFX(),
             new Nametags(),
             new ParticalFX(),
             new ReaperHoleESP()

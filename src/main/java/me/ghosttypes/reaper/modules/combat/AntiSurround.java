@@ -43,7 +43,7 @@ public class AntiSurround extends ReaperModule {
 
     private final Setting<Boolean> rightClickEat = sgMisc.add(new BoolSetting.Builder().name("right-click-eat").description("Stops breaking the block and starts eating EGapple.").defaultValue(false).build());
     private final Setting<Boolean> cancelEat = sgMisc.add(new BoolSetting.Builder().name("cancel-eat").description("Press right button again to stop eating.").defaultValue(true).visible(rightClickEat::get).build());
-    private final Setting<Boolean> useCrystals   = sgMisc.add(new BoolSetting.Builder().name("use-crystals").description("Places crystal forward to the target city block.").defaultValue(true).build());
+    private final Setting<Boolean> useCrystals = sgMisc.add(new BoolSetting.Builder().name("use-crystals").description("Places crystal forward to the target city block.").defaultValue(true).build());
     private final Setting<Double> breakProgress = sgMisc.add(new DoubleSetting.Builder().name("break-progress").description("Places crystal if break progress of breaking block is higher.").defaultValue(0.979).sliderRange(0, 1).visible(useCrystals::get).build());
     private final Setting<Boolean> support = sgMisc.add(new BoolSetting.Builder().name("support").description("Places obsidian block under potential crystal position.").defaultValue(false).visible(useCrystals::get).build());
     private final Setting<Boolean> ironPickaxe = sgMisc.add(new BoolSetting.Builder().name("iron-pickaxe").description("Uses iron pickaxe.").defaultValue(false).build());
@@ -120,7 +120,8 @@ public class AntiSurround extends ReaperModule {
             return;
         }
 
-        if (rotate.get() && breakPos != null) Rotations.rotate(Rotations.getYaw(breakPos), Rotations.getPitch(breakPos));
+        if (rotate.get() && breakPos != null)
+            Rotations.rotate(Rotations.getYaw(breakPos), Rotations.getPitch(breakPos));
 
         if (breakPos == null) breakPos = CityUtils.getBreakPos(target); // find pos once
         if (breakPos == null || mc.world.getBlockState(breakPos).isAir()) { // toggles off if pos is null or air

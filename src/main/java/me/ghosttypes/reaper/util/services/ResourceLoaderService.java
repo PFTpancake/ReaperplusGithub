@@ -37,7 +37,7 @@ public class ResourceLoaderService {
     }
 
     public static void initUserDB() {
-        DEVELOPERS.addAll(List.of("GhostTypes", "PFTpancake", "Kiriyaga", "Wide_Cat", "tyrannus00"));
+        DEVELOPERS.addAll(List.of("GhostTypes", "PFTpancake", "Wide_Cat", "tyrannus00"));
         BETA.addAll(List.of("Aztrohh", "SpicyWoman", "lachedurv","teenagewomen", "esptoggled"));
         initDB(USER, USER_DB_URL);
     }

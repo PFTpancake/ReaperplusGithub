@@ -16,6 +16,7 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
+import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.Target;
@@ -47,8 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-// this is meteor just little things changed pls dont make fun of me tyrannnus
-public class AutoCrystal extends Module {
+
+public class TheReaper extends Module {
     public enum YawStepMode {
         Break,
         All,
@@ -65,18 +66,20 @@ public class AutoCrystal extends Module {
         Accurate,
         Fast
     }
-
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgRanges = settings.createGroup("Ranges");
+    private final SettingGroup sgdamage = settings.createGroup("Damage");
     private final SettingGroup sgPlace = settings.createGroup("Place");
-    private final SettingGroup sgFacePlace = settings.createGroup("Face Place");
     private final SettingGroup sgBreak = settings.createGroup("Break");
-    private final SettingGroup sgPause = settings.createGroup("Pause");
+    private final SettingGroup sgadvanced = settings.createGroup("Advanced");
+    private final SettingGroup sgFacePlace = settings.createGroup("Face Place");
+    private final SettingGroup sgWait = settings.createGroup("Pause");
     private final SettingGroup sgRender = settings.createGroup("Render");
 
     // General
 
-    private final Setting<Double> targetRange = sgGeneral.add(new DoubleSetting.Builder()
-        .name("target-range")
+    private final Setting<Double> targetRange = sgRanges.add(new DoubleSetting.Builder()
+        .name("range")
         .description("Range in which to target players.")
         .defaultValue(10)
         .min(0)
@@ -84,29 +87,22 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Boolean> predictMovement = sgGeneral.add(new BoolSetting.Builder()
-        .name("predict-Calc")
+    private final Setting<Boolean> predictMovement = sgadvanced.add(new BoolSetting.Builder()
+        .name("predict")
         .description("Predicts target movement.")
         .defaultValue(false)
         .build()
     );
 
-    private final Setting<Boolean> Popvo = sgGeneral.add(new BoolSetting.Builder()
-        .name("SpeedBypass")
-        .description("using packetshift to speed it up.")
-        .defaultValue(false)
-        .build()
-    );
-
-    private final Setting<Boolean> ignoreTerrain = sgGeneral.add(new BoolSetting.Builder()
-        .name("SmartBreak")
+    private final Setting<Boolean> ignoreTerrain = sgadvanced.add(new BoolSetting.Builder()
+        .name("ignore-terrain")
         .description("Completely ignores terrain if it can be blown up by end crystals.")
         .defaultValue(true)
         .build()
     );
 
 
-    private final Setting<Double> minDamage = sgGeneral.add(new DoubleSetting.Builder()
+    private final Setting<Double> minDamage = sgdamage.add(new DoubleSetting.Builder()
         .name("min-damage")
         .description("Minimum damage the crystal needs to deal to your target.")
         .defaultValue(6)
@@ -114,7 +110,7 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Double> maxDamage = sgGeneral.add(new DoubleSetting.Builder()
+    private final Setting<Double> maxDamage = sgdamage.add(new DoubleSetting.Builder()
         .name("max-damage")
         .description("Maximum damage crystals can deal to yourself.")
         .defaultValue(6)
@@ -133,12 +129,12 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("rotate")
         .description("Rotates server-side towards the crystals being hit/placed.")
-        .defaultValue(false)
+        .defaultValue(true)
         .build()
     );
 
     private final Setting<YawStepMode> yawStepMode = sgGeneral.add(new EnumSetting.Builder<YawStepMode>()
-        .name("yaw")
+        .name("yaw-steps-mode")
         .description("When to run the yaw steps check.")
         .defaultValue(YawStepMode.Break)
         .visible(rotate::get)
@@ -155,12 +151,13 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Boolean> antiSuicide = sgGeneral.add(new BoolSetting.Builder()
-        .name("no-suicide")
+        .name("anti-suicide")
         .description("Will not place and break crystals if they will kill you.")
         .defaultValue(true)
         .build()
     );
 
+    // Place
 
     private final Setting<Boolean> doPlace = sgPlace.add(new BoolSetting.Builder()
         .name("place")
@@ -170,7 +167,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Integer> placeDelay = sgPlace.add(new IntSetting.Builder()
-        .name("delay")
+        .name("place-delay")
         .description("The delay in ticks to wait to place a crystal after it's exploded.")
         .defaultValue(0)
         .min(0)
@@ -178,8 +175,8 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Double> placeRange = sgPlace.add(new DoubleSetting.Builder()
-        .name("range")
+    private final Setting<Double> placeRange = sgRanges.add(new DoubleSetting.Builder()
+        .name("place-range")
         .description("Range in which to place crystals.")
         .defaultValue(4.5)
         .min(0)
@@ -187,8 +184,8 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Double> placeWallsRange = sgPlace.add(new DoubleSetting.Builder()
-        .name("walls-range")
+    private final Setting<Double> placeWallsRange = sgRanges.add(new DoubleSetting.Builder()
+        .name("place-walls-range")
         .description("Range in which to place crystals when behind blocks.")
         .defaultValue(4.5)
         .min(0)
@@ -196,22 +193,22 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Boolean> placement112 = sgPlace.add(new BoolSetting.Builder()
+    private final Setting<Boolean> placement112 = sgadvanced.add(new BoolSetting.Builder()
         .name("1.12-placement")
         .description("Uses 1.12 crystal placement.")
         .defaultValue(false)
         .build()
     );
 
-    private final Setting<SupportMode> support = sgPlace.add(new EnumSetting.Builder<SupportMode>()
-        .name("support-MeteorStuff")
+    private final Setting<SupportMode> support = sgadvanced.add(new EnumSetting.Builder<SupportMode>()
+        .name("support")
         .description("Places a support block in air if no other position have been found.")
         .defaultValue(SupportMode.Disabled)
         .build()
     );
 
-    private final Setting<Integer> supportDelay = sgPlace.add(new IntSetting.Builder()
-        .name("support-delay-MeteorStuff")
+    private final Setting<Integer> supportDelay = sgadvanced.add(new IntSetting.Builder()
+        .name("support-delay")
         .description("Delay in ticks after placing support block.")
         .defaultValue(1)
         .min(0)
@@ -219,16 +216,17 @@ public class AutoCrystal extends Module {
         .build()
     );
 
+    // Face place
 
     private final Setting<Boolean> facePlace = sgFacePlace.add(new BoolSetting.Builder()
-        .name("face-place-MeteorStuff")
+        .name("face-place")
         .description("Will face-place when target is below a certain health or armor durability threshold.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> facePlaceHealth = sgFacePlace.add(new DoubleSetting.Builder()
-        .name("face-place-health-MeteorStuff")
+        .name("face-place-health")
         .description("The health the target has to be at to start face placing.")
         .defaultValue(8)
         .min(1)
@@ -239,7 +237,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Double> facePlaceDurability = sgFacePlace.add(new DoubleSetting.Builder()
-        .name("face-place-durability-MeteorStuff")
+        .name("face-place-durability")
         .description("The durability threshold percentage to be able to face-place.")
         .defaultValue(2)
         .min(1)
@@ -250,7 +248,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Boolean> facePlaceArmor = sgFacePlace.add(new BoolSetting.Builder()
-        .name("face-place-missing-armor-MeteorStuff")
+        .name("face-place-missing-armor")
         .description("Automatically starts face placing when a target misses a piece of armor.")
         .defaultValue(false)
         .visible(facePlace::get)
@@ -258,12 +256,13 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Keybind> forceFacePlace = sgFacePlace.add(new KeybindSetting.Builder()
-        .name("force-face-place-MeteorStuff")
+        .name("force-face-place")
         .description("Starts face place when this button is pressed.")
         .defaultValue(Keybind.none())
         .build()
     );
 
+    // Break
 
     private final Setting<Boolean> doBreak = sgBreak.add(new BoolSetting.Builder()
         .name("break")
@@ -273,7 +272,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Integer> breakDelay = sgBreak.add(new IntSetting.Builder()
-        .name("delay")
+        .name("break-delay")
         .description("The delay in ticks to wait to break a crystal after it's placed.")
         .defaultValue(0)
         .min(0)
@@ -281,7 +280,7 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Boolean> smartDelay = sgBreak.add(new BoolSetting.Builder()
+    private final Setting<Boolean> smartDelay = sgadvanced.add(new BoolSetting.Builder()
         .name("smart-delay")
         .description("Only breaks crystals when the target can receive damage.")
         .defaultValue(false)
@@ -296,8 +295,8 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Double> breakRange = sgBreak.add(new DoubleSetting.Builder()
-        .name("range")
+    private final Setting<Double> breakRange = sgRanges.add(new DoubleSetting.Builder()
+        .name("break-range")
         .description("Range in which to break crystals.")
         .defaultValue(4.5)
         .min(0)
@@ -305,8 +304,8 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Double> breakWallsRange = sgBreak.add(new DoubleSetting.Builder()
-        .name("walls-range")
+    private final Setting<Double> breakWallsRange = sgRanges.add(new DoubleSetting.Builder()
+        .name("break-walls-range")
         .description("Range in which to break crystals when behind blocks.")
         .defaultValue(4.5)
         .min(0)
@@ -322,7 +321,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Integer> breakAttempts = sgBreak.add(new IntSetting.Builder()
-        .name("attempts")
+        .name("Max-Attempts")
         .description("How many times to hit a crystal before stopping to target it.")
         .defaultValue(2)
         .sliderMin(1)
@@ -330,8 +329,8 @@ public class AutoCrystal extends Module {
         .build()
     );
 
-    private final Setting<Integer> ticksExisted = sgBreak.add(new IntSetting.Builder()
-        .name("existed")
+    private final Setting<Integer> ticksExisted = sgadvanced.add(new IntSetting.Builder()
+        .name("ticks-existed")
         .description("Amount of ticks a crystal needs to have lived for it to be attacked by CrystalAura.")
         .defaultValue(0)
         .min(0)
@@ -339,7 +338,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Integer> attackFrequency = sgBreak.add(new IntSetting.Builder()
-        .name("attackSpeed")
+        .name("Speed")
         .description("Maximum hits to do per second.")
         .defaultValue(25)
         .min(1)
@@ -348,7 +347,7 @@ public class AutoCrystal extends Module {
     );
 
     private final Setting<Boolean> fastBreak = sgBreak.add(new BoolSetting.Builder()
-        .name("ForceBreak")
+        .name("InstaBreak")
         .description("Ignores break delay and tries to break the crystal as soon as it's spawned in the world.")
         .defaultValue(true)
         .build()
@@ -361,22 +360,23 @@ public class AutoCrystal extends Module {
         .build()
     );
 
+    // Pause
 
-    private final Setting<Boolean> eatPause = sgPause.add(new BoolSetting.Builder()
+    private final Setting<Boolean> eatPause = sgWait.add(new BoolSetting.Builder()
         .name("pause-on-eat")
         .description("Pauses Crystal Aura when eating.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Boolean> drinkPause = sgPause.add(new BoolSetting.Builder()
+    private final Setting<Boolean> drinkPause = sgWait.add(new BoolSetting.Builder()
         .name("pause-on-drink")
         .description("Pauses Crystal Aura when drinking.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Boolean> minePause = sgPause.add(new BoolSetting.Builder()
+    private final Setting<Boolean> minePause = sgWait.add(new BoolSetting.Builder()
         .name("pause-on-mine")
         .description("Pauses Crystal Aura when mining.")
         .defaultValue(false)
@@ -388,7 +388,7 @@ public class AutoCrystal extends Module {
     private final Setting<Boolean> renderSwing = sgRender.add(new BoolSetting.Builder()
         .name("swing")
         .description("Renders hand swinging client side.")
-        .defaultValue(false)
+        .defaultValue(true)
         .build()
     );
 
@@ -413,17 +413,23 @@ public class AutoCrystal extends Module {
         .build()
     );
 
+    private final Setting<ShapeMode> fadetime = sgRender.add(new EnumSetting.Builder<ShapeMode>()
+        .name("fadetime")
+        .description("How the shapes are rendered.")
+        .defaultValue(ShapeMode.Both)
+        .build()
+    );
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
         .name("side-color")
         .description("The side color of the block overlay.")
-        .defaultValue(new SettingColor(155, 0, 0, 60))
+        .defaultValue(new SettingColor(255, 255, 255, 45))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
         .name("line-color")
         .description("The line color of the block overlay.")
-        .defaultValue(new SettingColor(0, 0, 0))
+        .defaultValue(new SettingColor(255, 255, 255))
         .build()
     );
 
@@ -504,8 +510,8 @@ public class AutoCrystal extends Module {
     private final BlockPos.Mutable breakRenderPos = new BlockPos.Mutable();
     private double renderDamage;
 
-    public AutoCrystal() {
-        super(ML.R, "AutoCrystal", "Pancake Aura");
+    public TheReaper() {
+        super(ML.R, "TheReaper", "idk");
     }
 
     @Override
@@ -997,7 +1003,6 @@ public class AutoCrystal extends Module {
         for (PlayerEntity target : targets) {
             BlockPos pos = target.getBlockPos();
 
-            //1k
             if (crystal.getY() == pos.getY() + 1 && Math.abs(pos.getX() - crystal.getX()) <= 1 && Math.abs(pos.getZ() - crystal.getZ()) <= 1) {
                 if (EntityUtils.getTotalHealth(target) <= facePlaceHealth.get()) return true;
 
@@ -1104,7 +1109,7 @@ public class AutoCrystal extends Module {
     @EventHandler
     private void onRender(Render3DEvent event) {
         if (renderTimer > 0 && render.get()) {
-            event.renderer.box(renderPos, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+            event.renderer.box(renderPos, sideColor.get(), lineColor.get(), fadetime.get(), 0);
         }
 
         if (breakRenderTimer > 0 && renderBreak.get() && !mc.world.getBlockState(breakRenderPos).isAir()) {

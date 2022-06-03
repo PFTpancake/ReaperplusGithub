@@ -128,6 +128,8 @@ public class BedAura extends ReaperModule {
 
     // rendering
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder().name("render").description("Renders an overlay where blocks will be placed.").defaultValue(true).build());
+    private final Setting<Boolean> detailedRender = sgRender.add(new BoolSetting.Builder().name("advanced render").description("pretty cool.").defaultValue(false).build());
+    private final Setting<Boolean> normalRender = sgRender.add(new BoolSetting.Builder().name("normal render").description("pretty cool.").defaultValue(false).build());
     public final Setting<Integer> bedRenderTime = sgRender.add(new IntSetting.Builder().name("render-time").defaultValue(3).min(1).sliderMax(10).visible(render::get).build());
     public final Setting<Integer> bedFadeTime = sgRender.add(new IntSetting.Builder().name("fade-factor").defaultValue(8).min(1).sliderMax(100).visible(render::get).build());
     public final Setting<RenderMode> renderMode = sgRender.add(new EnumSetting.Builder<RenderMode>().name("render-mode").description("How the render beds.").defaultValue(RenderMode.Outline).build());
@@ -142,6 +144,7 @@ public class BedAura extends ReaperModule {
     private BedPlacement placePos;
     private SimpleBedRender bedRender;
     private MineInstance trapMine, burrowMine, anvilMine, crystalbreak;
+    private int xOffset, zOffset;
     private int timer;
     private int tableTimer;
     private int syncTimer;
@@ -175,7 +178,6 @@ public class BedAura extends ReaperModule {
     private void onPostTick(TickEvent.Post event) { // stuff that doesn't need to be handled 'quickly' gets done post-tick
         if (bedRender != null) { // tick render
             bedRender.tick();
-            if (bedRender.shouldRemove()) bedRender = null;
         }
         if (autoCraftSync.get() && Interactions.isCrafting()) { // inventory syncing
             syncTimer--;
@@ -561,18 +563,154 @@ public class BedAura extends ReaperModule {
                     int z = placePos.getZ();
                     Color s = bedRender.getSideColor();
                     Color l = bedRender.getLineColor();
-                    switch (direction.toDirection().getOpposite()) {
-                        case NORTH -> event.renderer.box(x, y, z, x + 1, y + 0.4, z + 2, s, l, shapeMode.get(), 0);
-                        case SOUTH -> event.renderer.box(x, y, z - 1, x + 1, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
-                        case EAST -> event.renderer.box(x - 1, y, z, x + 1, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
-                        case WEST -> event.renderer.box(x, y, z, x + 2, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
+
+                    if (!normalRender.get())
+                        switch (direction.toDirection().getOpposite()) {
+                            case NORTH -> event.renderer.box(x, y, z, x + 1, y + 0.4, z + 2, s, l, shapeMode.get(), 0);
+                            case SOUTH -> event.renderer.box(x, y, z - 1, x + 1, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
+                            case EAST -> event.renderer.box(x - 1, y, z, x + 1, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
+                            case WEST -> event.renderer.box(x, y, z, x + 2, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
+                        }
+                    if (!detailedRender.get()) {
+                        switch (direction) {
+                            case North -> event.renderer.box(x, y, z - 1, x + 1, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+                            case South -> event.renderer.box(x, y, z, x + 1, y + 0.5625, z + 2, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+                            case East -> event.renderer.box(x, y, z, x + 2, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+                            case West -> event.renderer.box(x - 1, y, z, x + 1, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+                        }
+                    }
+                    if (detailedRender.get()) {
+                        switch (direction) {
+                            case North -> {
+                                // Body
+                                //event.renderer.box(x, y, z - 1, x + 1, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+
+                                // Left and Right
+                                event.renderer.box(x, y + 0.1875, z + 0.8125 + zOffset, x + 0.1875, y + 0.5625, z - 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), -39);
+                                event.renderer.box(x + 0.8125, y + 0.1875, z + 0.8125 + zOffset, x + 1, y + 0.5625, z - 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 56);
+
+                                // Front and Back
+                                event.renderer.box(x + 0.1875, y + 0.1875, z + 0.8125 + zOffset, x + 0.8125, y + 0.1875, z + 0.8125 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0.1875, y + 0.1875, z + 0.8125 + zOffset, x + 0.8125, y + 0.5625, z + 1 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0, y + 0.1875, z - 1 + zOffset, x + 0.8125, y + 0.1875, z - 0.8125 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0, y + 0.1875, z - 1 + zOffset, x + 0.8125, y + 0.5625, z - 1 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+
+                                // Legs
+                                event.renderer.box(x, y, z + 1 + zOffset, x + 0.1875, y + 0.1875, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                event.renderer.box(x, y, z - 1 + zOffset, x + 0.1875, y + 0.1875, z - 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                event.renderer.box(x + 0.8125, y, z + 1 + zOffset, x + 1, y + 0.1875, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                event.renderer.box(x + 1, y, z - 1 + zOffset, x + 0.8125, y + 0.1875, z - 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+
+                                // Corners
+                                event.renderer.box(x, y + 0.1875, z + 1 + zOffset, x + 0.1875, y + 0.5625, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), -44);
+                                event.renderer.box(x, y + 0.1875, z - 1 + zOffset, x + 0.1875, y + 0.5625, z - 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+                                event.renderer.box(x + 0.8125, y + 0.1875, z + 1 + zOffset, x + 1, y + 0.5625, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 52);
+                                event.renderer.box(x + 1, y + 0.1875, z - 1 + zOffset, x + 0.8125, y + 0.5625, z - 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+                            }
+                            case South -> {
+                                // Body
+                                // event.renderer.box(x, y, z, x + 1, y + 0.5625, z + 2, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+
+                                // Left and Right
+                                event.renderer.box(x, y + 0.1875, z + 1.8125 + zOffset, x + 0.1875, y + 0.5625, z + 0.18 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), -39);
+                                event.renderer.box(x + 0.8125, y + 0.1875, z + 1.8125 + zOffset, x + 1, y + 0.5625, z + 0.18 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 56);
+
+                                // Front and Back
+                                event.renderer.box(x + 0.1875, y + 0.1875, z + 0.8125 + zOffset, x + 0.8125, y + 0.1875, z + 1.8127 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0.1875, y + 0.1875, z + 0.8125 + zOffset, x + 0.8125, y + 0.5625, z + 2 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0.1875, y + 0.1875, z - 0 + zOffset, x + 0.8125, y + 0.1875, z + 0.1815 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0.1875, y + 0.1875, z + 0 + zOffset, x + 0.8125, y + 0.5625, z - 0 + zOffset, lineColor.get(), lineColor.get(), shapeMode.get(), 104);
+
+                                // Legs
+                                event.renderer.box(x, y, z + 2 + zOffset, x + 0.1875, y + 0.1875, z + 1.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                event.renderer.box(x, y, z - 0 + zOffset, x + 0.1875, y + 0.1875, z + 0.1825 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                event.renderer.box(x + 0.8125, y, z + 2 + zOffset, x + 1, y + 0.1875, z + 1.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                event.renderer.box(x + 1, y, z - 0 + zOffset, x + 0.8125, y + 0.1875, z + 0.1825 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+
+                                // Corners
+                                //right
+                                event.renderer.box(x, y + 0.1875, z + 2 + zOffset, x + 0.1875, y + 0.5625, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), -44);
+                                event.renderer.box(x, y + 0.1875, z - 0 + zOffset, x + 0.1875, y + 0.5625, z + 1 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+                                //left
+                                event.renderer.box(x + 0, y + 0.1875, z + 2 + zOffset, x + 1, y + 0.5625, z + 0 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 52);
+                                event.renderer.box(x + 1, y + 0.1875, z - 0 + zOffset, x + 0.8125, y + 0.5625, z - 0 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+
+                            }
+                            case East -> {
+                                // Body
+                                //event.renderer.box(x, y, z, x + 2, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+
+                                // front back
+                                event.renderer.box(x + 2, y + 0.1875, z, x + 2, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), -39);
+                                event.renderer.box(x + 1, y + 0.1875, z + 0.8125, x + 0, y + 0.5625, z + 0.1875, sideColor.get(), lineColor.get(), shapeMode.get(), 56);
+
+                                // Left and Right
+                                event.renderer.box(x + 0.1875, y + 0.1875, z + 0.8125, x + 1.8125, y + 0.5625, z + 0, sideColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x + 0.1875, y + 0.1875, z - 0.8125, x + 1.8125, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                // Legs
+                                //bottom right
+                                event.renderer.box(x, y, z + 1 + zOffset, x + 0.1875, y + 0.1875, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                //bottom left
+                                event.renderer.box(x, y, z - 0 + zOffset, x + 0.1875, y + 0.1875, z + 0.1825 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                //top right
+                                event.renderer.box(x + 1.8125, y, z + 1 + zOffset, x + 2, y + 0.1875, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                //top left
+                                event.renderer.box(x + 2, y, z - 0 + zOffset, x + 1.8125, y + 0.1875, z + 0.1825 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                // Corners
+                                //bottom right
+                                event.renderer.box(x, y + 0.1875, z + 1, x + 0.1875, y + 0.5625, z + 0.8125, sideColor.get(), lineColor.get(), shapeMode.get(), -44);
+                                //bottom left
+                                event.renderer.box(x, y + 0.1875, z - 0, x + 0.1875, y + 0.5625, z + 0.2, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+                                //top right
+                                event.renderer.box(x + 0.8125, y + 0.1875, z + 1, x + 2, y + 0.5625, z + 0.8125, sideColor.get(), lineColor.get(), shapeMode.get(), 52);
+                                //top left
+                                event.renderer.box(x + 2, y + 0.1875, z - 0, x + 1.8125, y + 0.5625, z - 0, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+
+                            }
+
+                            case West -> {
+                                // Body
+                                //event.renderer.box(x, y, z, x + 2, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+
+                                // front back
+                                event.renderer.box(x + 1, y + 0.1875, z + 0.1875, x + 2, y + 0.5625, z + 0.8125, sideColor.get(), lineColor.get(), shapeMode.get(), -39);
+                                event.renderer.box(x - 1, y + 0.1875, z + 0.1875, x + 2, y + 0.5625, z + 0.8125, sideColor.get(), lineColor.get(), shapeMode.get(), -39);
+
+                                // Left and Right
+                                event.renderer.box(x - 0.8125, y + 0.1875, z + 0.8125, x + 0.8125, y + 0.5625, z + 0, sideColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                event.renderer.box(x - 0.8125, y + 0.1875, z - 1, x + 0.8125, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 104);
+                                // Legs
+                                //bottom right
+                                event.renderer.box(x - 1, y, z + 1 + zOffset, x - 0.8125, y + 0.1875, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                //bottom left
+                                event.renderer.box(x - 1, y, z - 0 + zOffset, x - 0.8125, y + 0.1875, z + 0.1825 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                //top right
+                                event.renderer.box(x + 0.8125, y, z + 1 + zOffset, x + 1, y + 0.1875, z + 0.8125 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+                                //top left
+                                event.renderer.box(x + 1, y, z - 0 + zOffset, x + 0.8125, y + 0.1875, z + 0.1825 + zOffset, sideColor.get(), lineColor.get(), shapeMode.get(), 2);
+
+                                // Cornersw
+                                //bottom right
+                                event.renderer.box(x + 1, y + 0.1875, z + 1, x + 0.1875, y + 0.5625, z + 0, sideColor.get(), lineColor.get(), shapeMode.get(), -44);
+                                //bottom left
+                                event.renderer.box(x + 1, y + 0.1875, z - 0, x + 0.1875, y + 0.5625, z + 0.2, sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+                                //top right
+                                event.renderer.box(x + 0.8125, y + 0.1875, z + 1, x - 1, y + 0.5625, z + 0, sideColor.get(), lineColor.get(), shapeMode.get(), 52);
+                                //top left
+                                event.renderer.box(x - 1, y + 0.1875, z - 0, x + 0, y + 0.5625, z , sideColor.get(), lineColor.get(), shapeMode.get(), 84);
+
+
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    @EventHandler
+
+
+@EventHandler
     private void onRender2D(Render2DEvent event) { // damage rendering
         if (render.get() && bedRender != null && placeCheck(placePos) && target != null) {
             if (bedRender.getPos() == null) return;

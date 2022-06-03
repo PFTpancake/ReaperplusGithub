@@ -224,14 +224,11 @@ public class Interactions {
     public static FindItemResult findCraftTable() {
         return InvUtils.findInHotbar(Blocks.CRAFTING_TABLE.asItem());
     }
-    public static FindItemResult findXP() {
-        return InvUtils.findInHotbar(Items.EXPERIENCE_BOTTLE);
-    }
-    public static FindItemResult findXPinAll() {
-        return InvUtils.find(Items.EXPERIENCE_BOTTLE);
-    }
+    public static FindItemResult findXP() {return InvUtils.findInHotbar(Items.EXPERIENCE_BOTTLE);}
+    public static FindItemResult findXPinAll() {return InvUtils.find(Items.EXPERIENCE_BOTTLE);}
     public static FindItemResult findBed() {return InvUtils.findInHotbar(itemStack -> itemStack.getItem() instanceof BedItem);}
     public static FindItemResult findBedInAll() {return InvUtils.find(itemStack -> itemStack.getItem() instanceof BedItem);}
+    public static FindItemResult findpiston() {return InvUtils.findInHotbar(Items.PISTON);}
     public static FindItemResult findWool() {return InvUtils.find(itemStack -> BlockHelper.wools.contains(itemStack.getItem()));}
     public static FindItemResult findPlanks() {return InvUtils.find(itemStack -> BlockHelper.planks.contains(itemStack.getItem()));}
 

@@ -15,6 +15,7 @@ import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FlowableFluid;
+import net.minecraft.item.BedItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.hit.BlockHitResult;
@@ -39,6 +40,7 @@ public class BlockHelper {
 
     public enum BlockListType {
         Web,
+        Bed,
         Surround,
         DoubleSurround,
         SelfTrap,
@@ -112,9 +114,11 @@ public class BlockHelper {
     public static boolean isBurrowBlock(BlockPos pos) {return isTrapBlock(pos) || isAnvilBlock(pos);}
     public static boolean isObby(BlockPos pos) {return getBlock(pos) == Blocks.OBSIDIAN || getBlock(pos) == Blocks.CRYING_OBSIDIAN;}
     public static boolean isBedrock(BlockPos pos) {return getBlock(pos) == Blocks.BEDROCK;}
+    public static boolean isBed(BlockPos pos) {return getBlock(pos) == Blocks.PURPLE_BED;}
     public static boolean isEchest(BlockPos pos) {return getBlock(pos) == Blocks.ENDER_CHEST;}
     public static boolean isAnchor(BlockPos pos) {return getBlock(pos) == Blocks.RESPAWN_ANCHOR;}
     public static Vec3 vec3(BlockPos pos) {
+
         return new Vec3().set(pos.getX(), pos.getY(), pos.getZ());
     }
     public static Vec3d vec3d(BlockPos pos) {return new Vec3d(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);}

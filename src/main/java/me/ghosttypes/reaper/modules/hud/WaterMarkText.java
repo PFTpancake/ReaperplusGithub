@@ -35,17 +35,6 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
         double width = 0;
         double height = 0;
 
-        String t;
-        if (!SpotifyService.isSpotifyRunning) {
-            t = "Repear+ DevBuild 0.0.8";
-            t = "Repear+ DevBuild 0.0.8";
-        } else {
-            t = "Repear+ DevBuild 0.0.8 " + " " + "  " + " ";
-        }
-
-        width = Math.max(width, renderer.textWidth(t));
-        height += renderer.textHeight();
-        box.setSize(width, height);
     }
 
 
@@ -69,7 +58,7 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 
         String t;
 
-         t = "Reaper+ DevBuild 0.0.8";
+         t = "Reaper+ DevBuild 1.0 Test T-120";
 
         Renderer2D.COLOR.begin();
         if (drawSide.get()) Renderer2D.COLOR.quad(x + box.alignX(renderer.textWidth(t)) - 6, y - 4, TextRenderer.get().getWidth(t) + 10, renderer.textHeight(), sideC);

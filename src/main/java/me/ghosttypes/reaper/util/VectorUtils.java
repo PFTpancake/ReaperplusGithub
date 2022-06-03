@@ -63,6 +63,7 @@ public class VectorUtils {
         double dX = x2 - x1;
         double dY = y2 - y1;
         double dZ = z2 - z1;
+
         return Math.sqrt(dX * dX + dY * dY + dZ * dZ);
     }
 
@@ -70,27 +71,40 @@ public class VectorUtils {
         double dX = vec2.x - vec1.x;
         double dY = vec2.y - vec1.y;
         double dZ = vec2.z - vec1.z;
+
         return Math.sqrt(dX * dX + dY * dY + dZ * dZ);
     }
 
-    public static double distance(BlockPos block1, BlockPos block2) {
-        double dX = block2.getX() - block1.getX();
-        double dY = block2.getY() - block1.getY();
-        double dZ = block2.getZ() - block1.getZ();
+    public static double distance(BlockPos pos1, BlockPos pos2) {
+        double dX = pos2.getX() - pos1.getX();
+        double dY = pos2.getY() - pos1.getY();
+        double dZ = pos2.getZ() - pos1.getZ();
+
         return Math.sqrt(dX * dX + dY * dY + dZ * dZ);
     }
 
-    public static double distanceBetweenXZ(BlockPos pos1, BlockPos pos2) {
-        double d = pos1.getX() - pos2.getX();
-        double f = pos1.getZ() - pos2.getZ();
-        return MathHelper.sqrt((float) (d * d + f * f));
+    public static double distanceXZ(Vec3d pos1, Vec3d pos2) {
+        double dX = pos1.getX() - pos2.getX();
+        double dZ = pos1.getZ() - pos2.getZ();
+
+        return MathHelper.sqrt((float) (dX * dX + dZ * dZ));
     }
 
-    public static double distanceBetweenXZ(Vec3d pos1, Vec3d pos2) {
-        double d = pos1.getX() - pos2.getX();
-        double f = pos1.getZ() - pos2.getZ();
-        return MathHelper.sqrt((float) (d * d + f * f));
+    public static double distanceXZ(double x1, double x2, double z1, double z2) {
+        double dX = x1 - x2;
+        double dZ = z1 - z2;
+
+        return MathHelper.sqrt((float) (dX * dX + dZ * dZ));
     }
+
+    public static double distanceY(Vec3d pos1, Vec3d pos2) {
+        return Math.abs(pos2.y - pos1.y);
+    }
+
+    public static double distanceY(double y1, double y2) {
+        return Math.abs(y1 - y2);
+    }
+
 
     // Blocks
 
@@ -361,11 +375,9 @@ public class VectorUtils {
 
     public static FindItemResult findInHotbar(Predicate<ItemStack> isGood) {
         if (isGood.test(mc.player.getOffHandStack())) {
-            return new FindItemResult(SlotUtils.OFFHAND, mc.player.getOffHandStack().getCount());
         }
 
         if (isGood.test(mc.player.getMainHandStack())) {
-            return new FindItemResult(mc.player.getInventory().selectedSlot, mc.player.getMainHandStack().getCount());
         }
 
         return find(isGood, 0, 8);
@@ -396,7 +408,8 @@ public class VectorUtils {
             }
         }
 
-        return new FindItemResult(slot, count);
+
+        return null;
     }
 
     public static boolean swap(int slot, boolean swapBack) {

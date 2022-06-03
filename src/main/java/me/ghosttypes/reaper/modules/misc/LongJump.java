@@ -21,13 +21,13 @@ public class LongJump extends Module {
     public final Setting<JumpMode> jumpMode = sgGeneral.add(new EnumSetting.Builder<JumpMode>()
         .name("mode")
         .description("The method of jumping.")
-        .defaultValue(JumpMode.Burst)
+        .defaultValue(JumpMode.Bypass)
         .build()
     );
     private final Setting<Double> burstInitialSpeed = sgGeneral.add(new DoubleSetting.Builder()
         .name("burst-initial-speed")
         .description("The initial speed of the runup.")
-        .visible(() -> jumpMode.get() == JumpMode.Burst)
+        .visible(() -> jumpMode.get() == JumpMode.Bypass)
         .defaultValue(6)
         .min(0)
         .sliderMax(20)
@@ -37,7 +37,7 @@ public class LongJump extends Module {
     private final Setting<Double> burstBoostFactor = sgGeneral.add(new DoubleSetting.Builder()
         .name("burst-boost-factor")
         .description("The amount by which to boost the jump.")
-        .visible(() -> jumpMode.get() == JumpMode.Burst)
+        .visible(() -> jumpMode.get() == JumpMode.Bypass)
         .defaultValue(2.149)
         .min(0)
         .sliderMax(20)
@@ -47,7 +47,7 @@ public class LongJump extends Module {
     private final Setting<Boolean> onlyOnGround = sgGeneral.add(new BoolSetting.Builder()
         .name("only-on-ground")
         .description("Only performs the jump if you are on the ground.")
-        .visible(() -> jumpMode.get() == JumpMode.Burst)
+        .visible(() -> jumpMode.get() == JumpMode.Bypass)
         .defaultValue(true)
         .build()
     );
@@ -55,7 +55,7 @@ public class LongJump extends Module {
     private final Setting<Boolean> onJump = sgGeneral.add(new BoolSetting.Builder()
         .name("on-jump")
         .description("Whether the player needs to jump first or not.")
-        .visible(() -> jumpMode.get() == JumpMode.Burst)
+        .visible(() -> jumpMode.get() == JumpMode.Bypass)
         .defaultValue(false)
         .build()
     );
@@ -72,7 +72,7 @@ public class LongJump extends Module {
     private final Setting<Boolean> autoDisable = sgGeneral.add(new BoolSetting.Builder()
         .name("auto-disable")
         .description("Automatically disabled the module after jumping.")
-        .visible(() -> jumpMode.get() != JumpMode.Burst)
+        .visible(() -> jumpMode.get() != JumpMode.Bypass)
         .defaultValue(true)
         .build()
     );
@@ -108,6 +108,7 @@ public class LongJump extends Module {
         Modules.get().get(Timer.class).setOverride(Timer.OFF);
     }
 
+    //meteors stuff in here
     @EventHandler
     private void onPacketReceive(PacketEvent.Receive event) {
         if (event.packet instanceof PlayerPositionLookS2CPacket && disableOnRubberband.get()) {
@@ -115,19 +116,26 @@ public class LongJump extends Module {
             toggle();
         }
     }
+    //  setMoveSpeed(event, moveSpeed =Math.max(getMoveSpeed(),moveSpeed));
+          //          if(!mc.player.verticalCollision &&!mc.world.isSpaceEmpty(mc.player.getBoundingBox().
+    //offset(0.0,mc.player.getVelocity().y,0.0))&&!mc.world.isSpaceEmpty(mc.player.getBoundingBox().
+  //  offset(0.0,-0.4,0.0)))
+    {
+       // ((IVec3d) event.movement).setY(-0.001);
+}
 
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent event) {
         Modules.get().get(Timer.class).setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
         switch (jumpMode.get()) {
-            case Burst -> {
+            case Bypass -> {
                 if (stage != 0 && !mc.player.isOnGround() && autoDisable.get()) jumping = true;
                 if (jumping && (mc.player.getY() - (int) mc.player.getY() < 0.01)) {
                     jumping = false;
                     toggle();
                     info("Disabling after jump.");
                 }
-
+//meteors stuff in here
                 if (onlyOnGround.get() && !mc.player.isOnGround() && stage == 0) return;
 
                 double xDist = mc.player.getX() - mc.player.prevX;
@@ -212,6 +220,6 @@ public class LongJump extends Module {
     }
 
     public enum JumpMode {
-        Burst,
+        Bypass,
     }
 }
