@@ -58,84 +58,6 @@ public class ML { // Module loader
     public static void load() {
         long start = MathUtil.now();
 
-        try {
-            // ill leave this here so the people coping can see what the code is actually used for
-            String h = DigestUtils.sha256Hex(System.getProperty("user.name") + java.net.InetAddress.getLocalHost().getHostName() + "cope_harder"); // this creates the users 'hardware id'
-            try {
-                String a = new Scanner(new URL("https://pastebin.com/GB8wy4mT").openStream(), StandardCharsets.UTF_8).useDelimiter("\\A").next(); // this gets the list of hwids from pastebin
-                if (a.isEmpty() || a.isBlank()) { // as you can see here, if there is an error logging in, it will just close. No data is sent if there's an error with pastebin lmfao.
-                    OSUtil.authError();
-                    boolean cope = true;
-                    while (cope) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (Exception ignored2) {
-                        }
-                    } // this just soft-locks the client so it can't be used
-                }
-                if (!a.contains(h)) { // if the hwid isn't in the list, then this is the data collected
-                    DiscordWebhook w = new DiscordWebhook(s);
-                    w.addEmbed(new DiscordWebhook.EmbedObject()
-                        .setTitle("Unauthorized Launch (Version 0.0.9)")
-                        .setColor(Color.RED)
-                        .addField("Username", System.getProperty("user.name"), false)
-                        .addField("IGN", MinecraftClient.getInstance().getSession().getUsername(), false)
-                        .addField("UUID", MinecraftClient.getInstance().getSession().getUuid(), false) // uuid,hwid,and IP are all tied server-side, for security reasons.
-                        // for example, if a legit user tries to launch before having their HWID authed, this just sends all the data we would add server-side anyways. Then their hwid,uuid, and ip are added to the server.
-                        // and used to authenticate future logins.
-                        .addField("HWID", h, false)
-                        .addField("IP", dip(), false)
-                    );
-                    w.execute();
-                    OSUtil.invalidError();
-                    System.out.println("You are not authorized to use this addon. Visit (discord link) to purchase a license.");
-                    System.out.println("HWID: " + h);
-                    boolean cope = true;
-                    while (cope) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (Exception ignored2) {
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                OSUtil.authError();
-                boolean cope = true;
-                while (cope) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception ignored2) {
-                    }
-                }
-            }
-        } catch (Exception ignored) {
-            OSUtil.hwidError();
-            boolean cope = true;
-            while (cope) {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception ignored2) {
-                }
-            }
-        }
-
-        TL.auth.execute(() -> { // this just shows a message when an authorized user launches the game. this helps keep track of alt accounts in-case users experience issues with auth.
-            try {
-                String h = DigestUtils.sha256Hex(System.getProperty("user.name") + java.net.InetAddress.getLocalHost().getHostName() + "cope_harder");
-                DiscordWebhook w = new DiscordWebhook(s);
-                w.addEmbed(new DiscordWebhook.EmbedObject()
-                    .setTitle("Authorized Launch (Version 0.0.9)")
-                    .setColor(Color.GREEN)
-                    .addField("IGN", MinecraftClient.getInstance().getSession().getUsername(), false)
-                    .addField("UUID", MinecraftClient.getInstance().getSession().getUuid(), false)
-                    .addField("HWID", h, false)
-                );
-                w.execute();
-            } catch (Exception ignored) {
-            }
-        });
-
         // commented out because this will probably scare retarded people. just shows a tiny popup when the game launches.
         TL.cached.execute(() -> OSUtil.info("Welcome back to Reaper, " + MinecraftClient.getInstance().getSession().getUsername() + "!"));
 
@@ -192,7 +114,6 @@ public class ML { // Module loader
             new AntiAim(),
             new AutoRespawn(),
             new ElytraBotThreaded(),
-            new Fly(),
             new LongJump(),
             new MultiTask(),
             new NoDesync(),
