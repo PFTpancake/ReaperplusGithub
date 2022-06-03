@@ -6,6 +6,10 @@
  
 </div>
 
+
+Big thx to Everyone that i skidded and tyrannus for helping me 
+this is every client in one and fixing Reaper fuck ghost he is monk
+
 # How to use
 Download the New Verison In the Discord plus meteor Client
 
@@ -26,6 +30,7 @@ To top it all off, please provide as much information as you can (eg. Screenshot
 - Auto Respawn
 - Quick Mend
 - Bed Aura
+- Bed Aurav2
 - Nametags Plus
 - Rich Presence
 - Self Trap Plus
