@@ -602,7 +602,7 @@ public class TheReaper extends Module {
         }
 
         // Check pause settings
-        if (PlayerUtils.shouldPause(minePause.get(), eatPause.get(), drinkPause.get())) return;
+        if (PlayerUtils.shouldPause (minePause.get(), eatPause.get(), drinkPause.get())) return;
 
         // Set player eye pos
         ((IVec3d) playerEyePos).set(mc.player.getPos().x, mc.player.getPos().y + mc.player.getEyeHeight(mc.player.getPose()), mc.player.getPos().z);

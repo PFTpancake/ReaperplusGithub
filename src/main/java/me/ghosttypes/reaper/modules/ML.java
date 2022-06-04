@@ -122,7 +122,7 @@ public class ML { // Module loader
             new OneTap(),
             new PacketFly(),
             new RPC(),
-            new Speed(),
+            new StrafePlus(),
             new StepPlus(),
             new ReverseStep(),
             new StreamerMode(),

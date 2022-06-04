@@ -1,5 +1,6 @@
 package me.ghosttypes.reaper.modules.hud;
 
+import me.ghosttypes.reaper.Reaper;
 import me.ghosttypes.reaper.util.services.AuraSyncService;
 import me.ghosttypes.reaper.util.services.SpotifyService;
 import meteordevelopment.meteorclient.renderer.Renderer2D;
@@ -30,36 +31,36 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 
     private static final RainbowColor RAINBOW = new RainbowColor();
 
-    @Override
-    public void update(HudRenderer renderer) {
-        double width = 0;
-        double height = 0;
+        @Override
+        public void update(HudRenderer renderer) {
+            double width = 0;
+            double height = 0;
 
-    }
+            String t;
 
+            t = (Reaper.NAME + Reaper.VERSION);
 
-    @Override
-    public void render(HudRenderer renderer) {
-        double x = box.getX();
-        double y = box.getY();
-
-        if (isInEditor()) {
-            renderer.text("WaterMarkText", x, y, hud.secondaryColor.get());
-            return;
+            width = Math.max(width, renderer.textWidth(t));
+            height += renderer.textHeight();
+            box.setSize(width, height);
         }
 
-        RAINBOW.setSpeed(chromaSpeed.get() / 100);
-        Color next =  hud.secondaryColor.get();
-        if (AuraSyncService.isEnabled()) next =  hud.secondaryColor.get();
-        Color sideC = sideColor.get();
-        Color textColor = hud.secondaryColor.get();
-        if (chroma.get()) sideC = next;
-        if (chromaText.get()) textColor = next;
+        @Override
+        public void render(HudRenderer renderer) {
+            double x = box.getX();
+            double y = box.getY();
 
-        String t;
 
-         t = "Reaper+ DevBuild 1.0 Test T-120";
+            RAINBOW.setSpeed(chromaSpeed.get() / 100);
+            Color next = RAINBOW.getNext(renderer.delta); // store so the sides and back are synced
+            if (AuraSyncService.isEnabled()) next = AuraSyncService.RGB_COLOR;
+            Color sideC = sideColor.get();
+            Color textColor = hud.secondaryColor.get();
+            if (chroma.get()) sideC = next;
+            if (chromaText.get()) textColor = next;
 
+            String t;
+             t = (Reaper.NAME + Reaper.VERSION);
         Renderer2D.COLOR.begin();
         if (drawSide.get()) Renderer2D.COLOR.quad(x + box.alignX(renderer.textWidth(t)) - 6, y - 4, TextRenderer.get().getWidth(t) + 10, renderer.textHeight(), sideC);
         if (drawBack.get()) Renderer2D.COLOR.quad(x + box.alignX(renderer.textWidth(t)) - 2, y - 4, TextRenderer.get().getWidth(t) + 2, renderer.textHeight(), backColor.get());

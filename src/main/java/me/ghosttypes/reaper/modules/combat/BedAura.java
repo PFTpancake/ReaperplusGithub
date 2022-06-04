@@ -7,6 +7,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
@@ -67,6 +68,7 @@ public class BedAura extends ReaperModule {
     private final SettingGroup sgAutoCraft = settings.createGroup("AutoCraft");
     private final SettingGroup sgAntiHoleFag = settings.createGroup("AntiHoleFag");
     private final SettingGroup sgSync = settings.createGroup("Sync");
+    private final SettingGroup sgWait = settings.createGroup("Pause");
     private final SettingGroup sgRender = settings.createGroup("Render");
 
     // general
@@ -129,7 +131,6 @@ public class BedAura extends ReaperModule {
     // rendering
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder().name("render").description("Renders an overlay where blocks will be placed.").defaultValue(true).build());
     private final Setting<Boolean> detailedRender = sgRender.add(new BoolSetting.Builder().name("advanced render").description("pretty cool.").defaultValue(false).build());
-    private final Setting<Boolean> normalRender = sgRender.add(new BoolSetting.Builder().name("normal render").description("pretty cool.").defaultValue(false).build());
     public final Setting<Integer> bedRenderTime = sgRender.add(new IntSetting.Builder().name("render-time").defaultValue(3).min(1).sliderMax(10).visible(render::get).build());
     public final Setting<Integer> bedFadeTime = sgRender.add(new IntSetting.Builder().name("fade-factor").defaultValue(8).min(1).sliderMax(100).visible(render::get).build());
     public final Setting<RenderMode> renderMode = sgRender.add(new EnumSetting.Builder<RenderMode>().name("render-mode").description("How the render beds.").defaultValue(RenderMode.Outline).build());
@@ -139,6 +140,26 @@ public class BedAura extends ReaperModule {
     public final Setting<Double> damageScale = sgRender.add(new DoubleSetting.Builder().name("damage-scale").description("The scale of the damage text.").defaultValue(1.4).min(0).max(5.0).sliderMax(5.0).build());
     public final Setting<SettingColor> damageColor = sgRender.add(new ColorSetting.Builder().name("damage-color").description("The color of the damage text.").defaultValue(new SettingColor(15, 255, 211)).build());
 
+    private final Setting<Boolean> eatPause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-eat")
+        .description("Pauses Crystal Aura when eating.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> drinkPause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-drink")
+        .description("Pauses Crystal Aura when drinking.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> minePause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-mine")
+        .description("Pauses Crystal Aura when mining.")
+        .defaultValue(false)
+        .build()
+    );
 
     private PlayerEntity target;
     private BedPlacement placePos;
@@ -202,6 +223,7 @@ public class BedAura extends ReaperModule {
 
     @EventHandler
     private void onPreTick(TickEvent.Pre event) {
+        if (PlayerUtils.shouldPause(minePause.get(), eatPause.get(), drinkPause.get())) return;
         timer--;
         if (autoCraft.get()) doAutoCraft(); // auto craft + move bed to hotbar if needed
         doRefill();
@@ -258,6 +280,7 @@ public class BedAura extends ReaperModule {
             if (canZeroTick()) timer = getZeroTick();
             doBomb(); // place / break
         }
+
     }
 
     private boolean canZeroTick() {
@@ -563,14 +586,6 @@ public class BedAura extends ReaperModule {
                     int z = placePos.getZ();
                     Color s = bedRender.getSideColor();
                     Color l = bedRender.getLineColor();
-
-                    if (!normalRender.get())
-                        switch (direction.toDirection().getOpposite()) {
-                            case NORTH -> event.renderer.box(x, y, z, x + 1, y + 0.4, z + 2, s, l, shapeMode.get(), 0);
-                            case SOUTH -> event.renderer.box(x, y, z - 1, x + 1, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
-                            case EAST -> event.renderer.box(x - 1, y, z, x + 1, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
-                            case WEST -> event.renderer.box(x, y, z, x + 2, y + 0.4, z + 1, s, l, shapeMode.get(), 0);
-                        }
                     if (!detailedRender.get()) {
                         switch (direction) {
                             case North -> event.renderer.box(x, y, z - 1, x + 1, y + 0.5625, z + 1, sideColor.get(), lineColor.get(), shapeMode.get(), 0);

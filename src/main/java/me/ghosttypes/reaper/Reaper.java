@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandles;
 
 public class Reaper extends MeteorAddon {
     public static String VERSION = "Test 1.0 T-120";
+    public static String NAME = "Reaper+";
     public static String INVITE_LINK = "https://discord.gg/RT5JFMZxvF";
     public static final File FOLDER = new File(System.getProperty("user.home"), "Reaper");
     public static final File RECORDINGS = new File(FOLDER, "recordings");
