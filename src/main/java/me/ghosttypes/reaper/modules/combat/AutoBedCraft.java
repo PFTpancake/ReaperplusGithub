@@ -71,13 +71,14 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.tick.Tick;
 
 import java.util.List;
 
 public class AutoBedCraft extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgWait = settings.createGroup("Pause");
     private final SettingGroup sgAuto = settings.createGroup("Auto (Buggy)");
     private final Setting<Boolean> disableAfter = sgGeneral.add(new BoolSetting.Builder().name("disable-after").description("Toggle off after filling your inv with beds.").defaultValue(false).build());
     private final Setting<Boolean> disableNoMats = sgGeneral.add(new BoolSetting.Builder().name("disable-on-no-mats").description("Toggle off if you run out of material.").defaultValue(false).build());
@@ -93,6 +94,27 @@ public class AutoBedCraft extends Module {
     private final Setting<Integer> emptySlotsNeeded = sgAuto.add(new IntSetting.Builder().name("required-empty-slots").description("How many empty slots are required for activation.").defaultValue(5).min(1).build());
     private final Setting<Integer> radius = sgAuto.add(new IntSetting.Builder().name("radius").description("How far to search for crafting tables near you.").defaultValue(3).min(1).build());
     private final Setting<Double> minHealth = sgAuto.add(new DoubleSetting.Builder().name("min-health").description("Min health require to activate.").defaultValue(10).min(1).max(36).sliderMax(36).build());
+
+    private final Setting<Boolean> eatPause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-eat")
+        .description("Pauses Crystal Aura when eating.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> drinkPause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-drink")
+        .description("Pauses Crystal Aura when drinking.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> minePause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-mine")
+        .description("Pauses Crystal Aura when mining.")
+        .defaultValue(false)
+        .build()
+    );
 
 
     public AutoBedCraft() {
@@ -176,9 +198,11 @@ public class AutoBedCraft extends Module {
                     }
                 }
             }
-
-
         }
+    }
+    @EventHandler
+    public void onPreTick(TickEvent.Pre event) {
+        if (PlayerUtils.shouldPause(minePause.get(), eatPause.get(), drinkPause.get())) return;
     }
 
     private void placeCraftingTable(FindItemResult craftTable) {

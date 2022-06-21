@@ -84,6 +84,7 @@ public class ML { // Module loader
             new Auto32k(),
             new BedAura(),
             new BedAura2(),
+            new PistonAura(),
             new QuickMend(),
             new ReaperSurround(),
             new SelfTrapPlus(),

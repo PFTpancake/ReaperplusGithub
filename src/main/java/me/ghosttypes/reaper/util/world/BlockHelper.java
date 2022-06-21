@@ -43,6 +43,7 @@ public class BlockHelper {
         Bed,
         Surround,
         DoubleSurround,
+        ExtraSurround,
         SelfTrap,
         PistonTrap
     }
@@ -241,6 +242,7 @@ public class BlockHelper {
         switch (type) {
             case Web -> IntStream.rangeClosed(0, 3).boxed().sorted(Collections.reverseOrder()).forEach(i -> blocks.add(center.up(i)));
             case Surround -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(center.offset(dir.toDirection())); }
+            case ExtraSurround -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(center.offset(dir.toDirection())); }
             case SelfTrap -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(up.offset(dir.toDirection())); }
             case PistonTrap -> { for (CardinalDirection dir : CardinalDirection.values()) blocks.add(up.offset(dir.toDirection())); }
             case DoubleSurround -> {
@@ -263,6 +265,7 @@ public class BlockHelper {
 
     public static ArrayList<BlockPos> getSurroundBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.Surround); }
     public static ArrayList<BlockPos> getDoubleSurroundBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.DoubleSurround); }
+    public static ArrayList<BlockPos> getExtraSurroundBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.ExtraSurround); }
     public static ArrayList<BlockPos> getSelfTrapBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.SelfTrap); }
     public static ArrayList<BlockPos> getPistonTrapBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.PistonTrap); }
     public static ArrayList<BlockPos> getWebBlocks(PlayerEntity player) { return getBlockList(player.getBlockPos(), BlockListType.Web); }

@@ -3,11 +3,13 @@ package me.ghosttypes.reaper.modules.combat;
 import com.google.common.util.concurrent.AtomicDouble;
 import it.unimi.dsi.fastutil.ints.*;
 import me.ghosttypes.reaper.modules.ML;
+import me.ghosttypes.reaper.util.render.Renderers;
 import meteordevelopment.meteorclient.events.entity.EntityAddedEvent;
 import meteordevelopment.meteorclient.events.entity.EntityRemovedEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
+import me.ghosttypes.reaper.util.render.Renderers;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IBox;
 import meteordevelopment.meteorclient.mixininterface.IRaycastContext;
@@ -511,7 +513,7 @@ public class TheReaper extends Module {
     private double renderDamage;
 
     public TheReaper() {
-        super(ML.R, "TheReaper", "idk");
+        super(ML.R, "The Reaper", "idk");
     }
 
     @Override
@@ -1114,11 +1116,11 @@ public class TheReaper extends Module {
 
         if (breakRenderTimer > 0 && renderBreak.get() && !mc.world.getBlockState(breakRenderPos).isAir()) {
             int preSideA = sideColor.get().a;
-            sideColor.get().a -= 20;
+            sideColor.get().a -= 50;
             sideColor.get().validate();
 
             int preLineA = lineColor.get().a;
-            lineColor.get().a -= 20;
+            lineColor.get().a -= 50;
             lineColor.get().validate();
 
             event.renderer.box(breakRenderPos, sideColor.get(), lineColor.get(), shapeMode.get(), 0);

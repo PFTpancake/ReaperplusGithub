@@ -17,6 +17,7 @@ import meteordevelopment.meteorclient.utils.entity.TargetUtils;
 import meteordevelopment.meteorclient.utils.misc.Vec3;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
@@ -24,13 +25,16 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
+import net.minecraft.util.TickDurationMonitor;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.tick.Tick;
 
 public class AntiSurround extends ReaperModule {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgMisc = settings.createGroup("Misc");
+    private final SettingGroup sgWait = settings.createGroup("Misc");
     private final SettingGroup sgRender = settings.createGroup("Render");
     private final SettingGroup sgNone = settings.createGroup("");
 
@@ -54,6 +58,28 @@ public class AntiSurround extends ReaperModule {
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder().name("line-line").description("The line color of the target block rendering.").defaultValue(new SettingColor(146, 255, 228)).visible(() -> render.get() && (shapeMode.get() == ShapeMode.Lines || shapeMode.get() == ShapeMode.Both)).build());
     private final Setting<Boolean> renderProgress = sgRender.add(new BoolSetting.Builder().name("render-progress").description("Renders the breaking progress.").defaultValue(true).build());
     private final Setting<Double> scale = sgRender.add(new DoubleSetting.Builder().name("scale").description("Scale of the breaking progress.").defaultValue(1.5).sliderRange(0.01, 3).visible(renderProgress::get).build());
+
+    private final Setting<Boolean> eatPause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-eat")
+        .description("Pauses Crystal Aura when eating.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> drinkPause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-drink")
+        .description("Pauses Crystal Aura when drinking.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> minePause = sgWait.add(new BoolSetting.Builder()
+        .name("pause-on-mine")
+        .description("Pauses Crystal Aura when mining.")
+        .defaultValue(false)
+        .build()
+    );
+
 
     public AntiSurround() {
         super(ML.R, "anti-surround", "Automatically breaks target's surround.");
@@ -87,6 +113,11 @@ public class AntiSurround extends ReaperModule {
             mc.options.useKey.setPressed(false);
             isEating = false;
         }
+    }
+
+    @EventHandler
+    public void onPreTick(TickEvent.Pre event) {
+        if (PlayerUtils.shouldPause(minePause.get(), eatPause.get(), drinkPause.get())) return;
     }
 
     @EventHandler
@@ -146,7 +177,7 @@ public class AntiSurround extends ReaperModule {
                             int prevSlot = mc.player.getInventory().selectedSlot;
                             if (mc.player.getOffHandStack().getItem() != Items.OBSIDIAN)
                                 mc.player.getInventory().selectedSlot = obsidian.slot();
-                            mc.interactionManager.interactBlock(mc.player, mc.world, obsidian.getHand(), new BlockHitResult(mc.player.getPos(), Direction.DOWN, CityUtils.getCrystalPos(breakPos, support.get()), true));
+                            new BlockHitResult(mc.player.getPos(), Direction.DOWN, CityUtils.getCrystalPos(breakPos, support.get()), true);
                             mc.player.getInventory().selectedSlot = prevSlot;
                         });
                     }
@@ -155,7 +186,7 @@ public class AntiSurround extends ReaperModule {
                         int prevSlot = mc.player.getInventory().selectedSlot;
                         if (mc.player.getOffHandStack().getItem() != Items.END_CRYSTAL)
                             mc.player.getInventory().selectedSlot = crystal.slot();
-                        mc.interactionManager.interactBlock(mc.player, mc.world, crystal.getHand(), new BlockHitResult(mc.player.getPos(), Direction.DOWN, CityUtils.getCrystalPos(breakPos, false), true));
+                        new BlockHitResult(mc.player.getPos(), Direction.DOWN, CityUtils.getCrystalPos(breakPos, false), true);
                         mc.player.getInventory().selectedSlot = prevSlot;
                     });
                 }

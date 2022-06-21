@@ -102,6 +102,21 @@ public class  CombatHelper {
             BlockHelper.isBlastRes(blockPos.add(0, 1, 1)) &&
             BlockHelper.isBlastRes(blockPos.add(0, 1, -1));
     }
+    public static boolean isExtraSurrounded(LivingEntity entity) {
+        BlockPos blockPos = entity.getBlockPos();
+        return BlockHelper.isBlastRes(blockPos.add(1, 0, 0)) &&
+            BlockHelper.isBlastRes(blockPos.add(-1, 0, 0)) &&
+            BlockHelper.isBlastRes(blockPos.add(0, 0, 1)) &&
+            BlockHelper.isBlastRes(blockPos.add(0, 0, -1)) &&
+        BlockHelper.isBlastRes(blockPos.add(-1, 0, 1)) &&
+            BlockHelper.isBlastRes(blockPos.add(1, 0, 1)) &&
+            BlockHelper.isBlastRes(blockPos.add(1, 0, 1)) &&
+        BlockHelper.isBlastRes(blockPos.add(-1, 0, -1)) &&
+            BlockHelper.isBlastRes(blockPos.add(0, 0, 1)) &&
+            BlockHelper.isBlastRes(blockPos.add(0, 0, -1));
+
+
+    }
 
     public static BlockPos getWebPos(PlayerEntity p) {
         if (p == null) return null;
